@@ -1,35 +1,30 @@
-import React, { useState, useEffect } from "react";
-import "./registeruser.css";
-import "./datatable.scss";
-import { DataGrid } from "@mui/x-data-grid";
-import { Link, useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { DataGrid } from "@mui/x-data-grid";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./datatable.scss";
+import "./registeruser.css";
  
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 
 import {
-  collection,
-  getDocs,
-  addDoc,
   Timestamp,
+  addDoc,
+  collection,
   deleteDoc,
   doc,
   onSnapshot,
-  updateDoc,
+  updateDoc
 } from "firebase/firestore";
 import { db } from "../../firebase";
 
 const Datatable = () => {
   const [data, setData] = useState([]);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -37,15 +32,12 @@ const Datatable = () => {
 
   const handleClose = () => {
     setOpen(false);
+    setFormData(initialState);
+    setQuizId(null);
   };
 
   const navigate = useNavigate();
-  const handleCheckboxChange = (docId, value) => {
-    const quizRef = doc(db, "quiz", docId);
-    updateDoc(quizRef, {
-      active: value,
-    });
-  };
+
 
   useEffect(() => {
     const unsub = onSnapshot(
@@ -97,20 +89,21 @@ const Datatable = () => {
     setFormData({ ...formData, [id]: value });   
   };
 
-  const handleEdit = (doc)=>{
+  const handleEdit = (doc) => {
+    console.log('edit calling')
     setQuizId(doc.id);
     formData.startAt = doc.startAt.toDate().toISOString().slice(0,-1);
     formData.endAt = doc.endAt.toDate().toISOString().slice(0,-1);
     formData.quiz = doc.quiz.toDate().toISOString().slice(0,-1);
-    formData.fee = doc.fee;
-    formData.percentage = doc.percentage;
-    formData.prize = doc.prize;
+    formData.fee = doc.fee.toString();
+    formData.percentage = doc.percentage.toString();
+    formData.prize = doc.prize.toString();
     handleClickOpen();
   }
   const handleDelet = async (id)=>{
     try {
-
       await deleteDoc(doc(db, `quiz/`, id));
+      setFormData(initialState);
     } catch (err) {
       console.log(err);
     }
@@ -120,45 +113,47 @@ const Datatable = () => {
     setFormData(initialState);
     handleClickOpen();
   }
-
+  console.log(formData);
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    console.log("handleAdd");
-   
+    console.log('add new calling')
     try {
        formData.startAt =Timestamp.fromDate(new Date(formData.startAt));
        formData.endAt = Timestamp.fromDate(new Date(formData.endAt));
+       formData.quiz = Timestamp.fromDate(new Date());
        formData.fee =parseInt( formData.fee);
        formData.percentage =parseInt( formData.percentage);
        formData.prize =parseInt( formData.prize);
-       console.log(quizId)
-       if(quizId==null){
-         formData.quiz = Timestamp.fromDate(new Date());
-         await addDoc(collection(db, "quiz"), {
-           ...formData,
-           winner:"",
-           active:false
-          });
-        }else{
-         formData.quiz = Timestamp.fromDate(new Date(formData.quiz));
-         await updateDoc(doc(db,"quiz",quizId), {
-           ...formData,  
-         });
+       
+      if (quizId == null) {
+        console.log('adding new')
+        await addDoc(collection(db, "quiz"), {
+          ...formData,
+          winner:"",
+          active:false
+        });
+        
+      } else {
+        console.log(formData)
+        console.log('updating')
+        await updateDoc(doc(db,"quiz",quizId), {
+          ...formData,  
+        });
+
       }
-      
+      handleClose();
     } catch (err) {
       console.log(err);
     }
-  };
-   console.log(formData);
+  }; 
 
 
   const userColumns = [
     {
       field: "startAt",
       headerName: "Start Date",
-      width: 250,
+      flex:1,
       renderCell: (params) => {
         return (
           <div>
@@ -172,7 +167,7 @@ const Datatable = () => {
     {
       field: "endAt",
       headerName: "End Date",
-      width: 250,
+      flex:1,
       renderCell: (params) => {
         return (
           <div>
@@ -242,7 +237,7 @@ const Datatable = () => {
     <div>
        
       <Dialog fullWidth={true}
-        minWidth={500} open={open} onClose={handleClose}>
+         open={open} onClose={handleClose}>
         <DialogTitle> {quizId==null? "Add New Quiz":"Edit Quiz"}</DialogTitle>
         <DialogContent>
           
@@ -317,7 +312,7 @@ const Datatable = () => {
       </Dialog>
       <div className="table_header">
         <h2>Available Quizes</h2>
-        <Button variant="outlined" onClick={()=>handleAddNew()}>
+        <Button variant="outlined" onClick={handleAddNew}>
         + Add New
       </Button>
         

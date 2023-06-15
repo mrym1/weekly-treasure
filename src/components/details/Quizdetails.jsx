@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from "react";
-import "../HomePage/datatable.css";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import { DataGrid } from "@mui/x-data-grid";
 import {
+  addDoc,
   collection,
-  getDocs,
-  serverTimestamp,
   deleteDoc,
   doc,
   onSnapshot,
-  updateDoc,
-  addDoc,
-  getDoc,
+  updateDoc
 } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { db, storage } from "../../firebase";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import "../HomePage/datatable.css";
 
 const Quizdetails = () => {
   const initialState = {
@@ -21,6 +24,7 @@ const Quizdetails = () => {
     answer: "",
     hint: "",
   };
+  
 
   const [data, setData] = useState([]);
   const [questionId, setQuestionId] = useState("");
@@ -30,6 +34,15 @@ const Quizdetails = () => {
   const { question, answer, hint } = dataForm;
   const [file, setFile] = useState(null);
   const [imageProgress, setImageProgress] = useState(null);
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const onAddImage = (file) => {
     setFile(file);
@@ -42,7 +55,9 @@ const Quizdetails = () => {
 
   const addQuestionModel = () => {
     setDataForm(initialState);
-    setShowModal(!showModal);
+    setFile(null);
+    setImageProgress(null);
+    handleClickOpen();
   };
 
   useEffect(() => {
@@ -79,13 +94,11 @@ const Quizdetails = () => {
   const handleEdit = async (doc) => {
     try {
       setQuestionId(doc.id);
-      
       dataForm.picture = doc.picture;
       dataForm.question = doc.question;
       dataForm.answer = doc.answer;
       dataForm.hint = doc.hint;
-
-      setShowModal(!showModal);
+      handleClickOpen()
     } catch (err) {
       console.log(err);
     }
@@ -121,40 +134,96 @@ const Quizdetails = () => {
       }
     );
   };
-  //   useEffect(() => {
-
-  //     file && uploadFile();
-  //   }, [file]);
+  
   console.log(dataForm);
   const handleAdd = async (e) => {
     e.preventDefault();
     console.log("handleAdd");
     try {
-      if (file == null) {
+      if (file == null && questionId=="") {
         dataForm.picture="";
       }
       dataForm.hint = parseInt(dataForm.hint);
       if (questionId == "") {
+        console.log('adding')
         await addDoc(collection(db, `quiz/${quizId}/questions`), {
           ...dataForm,
         });
       } else {
-        await updateDoc(doc(db, `quiz/${quizId}/questions/`, id), {
+        await updateDoc(doc(db, `quiz/${quizId}/questions/`, questionId), {
           ...dataForm,
         });
       }
+      setDataForm(initialState);
+      setFile(null);
+      setImageProgress(null);
+      handleClose()
     } catch (err) {
       console.log(err);
     }
   };
-
+  const userColumns = [
+    {
+      field: "picture",
+      headerName: "Image",
+      width: 150,
+      rowHeight:80,
+      renderCell: (params) => {
+        return (
+          <img style={{width:50,height:50}} src={params.row.picture|| null} />
+        );
+      },
+    },
+    {
+      field: "question",
+      headerName: "Question",
+      flex:1
+    },
+    {
+      field: "answer",
+      headerName: "Answer",
+      flex:0.5
+    },
+     
+    {
+      field: "hint",
+      headerName: "Hint",
+    }
+  ];
+  const actionColumn = [
+    {
+      field: "action",
+      headerName: "Action",
+      width: 200,
+      renderCell: (params) => {
+        return (
+                <td>
+                  <button onClick={() => handleEdit(params.row)}>
+                    <i className="fa-solid fa-edit"></i>
+                  </button>
+                  <button onClick={() => handleDelete(params.row.id)}>
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+        );
+      },
+    },
+  ];
   return (
-    <div className="table">
+    <div  className="table">
       <div className="page_header">
         <h1>Quiz Details</h1>
-      
-
-          {showModal && (
+        <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Use Google's location service?"}
+        </DialogTitle>
+        <DialogContent>
+        {(
             <div
               id="authentication-modal"
               tabIndex="-1"
@@ -163,50 +232,7 @@ const Quizdetails = () => {
             >
               <div className="relative w-full max-w-md max-h-full">
                 <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                  <button
-                    type="button"
-                    onClick={addQuestionModel}
-                    className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
-                    data-modal-hide="authentication-modal"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      className="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      ></path>
-                    </svg>
-                    <span className="sr-only">Close modal</span>
-                  </button>
                   <div className="register">
-                    <button
-                      type="button"
-                      onClick={addQuestionModel}
-                      className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white"
-                      data-modal-hide="authentication-modal"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
-                      <span className="sr-only">Close modal</span>
-                    </button>
-
                     <div className="container">
                       <div className="title">{questionId == ""?'Add Question':'Edit Question'}</div>
                       <div className="content">
@@ -283,8 +309,10 @@ const Quizdetails = () => {
                                 disabled={imageProgress !== null && imageProgress < 100}
                                 type="submit"
                                 value={questionId == "" ? "Add" : "Update"}
-                              />
-                            </div>
+                                /> 
+                              </div>
+                              <Button onClick={handleClose}>Cancel</Button>
+                            
                           </div>
                         </form>
                       </div>
@@ -294,6 +322,10 @@ const Quizdetails = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+         
+      </Dialog>
+          
         </div>
       {/* </div> */}
 
@@ -308,41 +340,19 @@ const Quizdetails = () => {
             Add Question
           </button>
           </div>
-          </div>
-
-      <div className="table_section">
-        <table>
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Question</th>
-              <th>Answer</th>
-              <th>Hint</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((data) => (
-              <tr key={data.id}>
-                <td>
-                  <img src={data.picture|| null} />
-                </td>
-                <td>{data.question}</td>
-                <td>{data.answer}</td>
-                <td>{data.hint}</td>
-                <td>
-                  <button onClick={() => handleEdit(data)}>
-                    <i className="fa-solid fa-edit"></i>
-                  </button>
-                  <button onClick={() => handleDelete(data.id)}>
-                    <i className="fa-solid fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
+      <Box sx={{ width: '100%' }}>
+      <DataGrid
+          autoHeight
+          rowHeight={80}
+          rows={data}
+          getRowId={(row) => row.id}
+          columns={userColumns.concat(actionColumn)}
+          pageSize={10}
+          rowsPerPageOptions={[]}
+        />
+    </Box>
+       
     </div>
   );
 };
