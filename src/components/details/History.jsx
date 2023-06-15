@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import { DataGrid } from "@mui/x-data-grid";
 import {
@@ -51,22 +52,51 @@ const Quizdetails = () => {
       field: "Image",
       headerName: "Image",
       width: 100,
-      renderCell:UserDetails()
+        renderCell: (params) => {
+        return (
+          <UserImage
+          userId={params.row.userId}
+        />
+        );
+      },
+      
+    },
+    {
+      field: "Name",
+      headerName: "Name",
+      flex:1,
+        renderCell: (params) => {
+        return (
+          <UserName
+          userId={params.row.userId}
+        />
+        );
+      },
+      
+    },
+    {
+      field: "Email",
+      headerName: "Email",
+    flex:1,
+        renderCell: (params) => {
+        return (
+          <UserEmail
+          userId={params.row.userId}
+        />
+        );
+      },
+      
     },
     
   ];
   const actionColumn = [
     {
       field: "See Response",
-      headerName: "Action",
+      headerName: "See Response",
       width: 200,
       renderCell: (params) => {
         return (
-                <td>
-                  <button >
-                    <i className="fa-solid fa-edit"></i>
-                  </button>
-                </td>
+                <Button>View</Button>
         );
       },
     },
@@ -95,7 +125,7 @@ const Quizdetails = () => {
     </div>
   );
 };
-const UserDetails = (props) => {
+const UserImage = (props) => {
   const { userId } = props;
   const [data, setData] = useState(null);      
 
@@ -118,10 +148,62 @@ const UserDetails = (props) => {
   }, [userId]);
 
   return (
-    (data &&  <img
-      src="https://i.imgur.com/MK3eW3Am.jpg"
+    (data &&  <img style={{height:50,width:50}}
+      src={data.image}
       alt="Katherine Johnson"
     />)
+  );
+};
+const UserName = (props) => {
+  const { userId } = props;
+  const [data, setData] = useState(null);      
+
+  useEffect(() => {
+    const unsub = onSnapshot(
+      doc(db, `users/${userId}`),
+      (snapShot) => {
+        setData(snapShot.data())
+
+        console.log(snapShot.data())
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+    return () => {
+      unsub();
+    };
+  }, [userId]);
+
+  return (
+     (data && <p> {data.winningName} </p>)
+  );
+};
+const UserEmail = (props) => {
+  const { userId } = props;
+  const [data, setData] = useState(null);      
+
+  useEffect(() => {
+    const unsub = onSnapshot(
+      doc(db, `users/${userId}`),
+      (snapShot) => {
+        setData(snapShot.data())
+
+        console.log(snapShot.data())
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+
+    return () => {
+      unsub();
+    };
+  }, [userId]);
+
+  return (
+     (data && <p> {data.winningEmail} </p>)
+  
   );
 };
 
