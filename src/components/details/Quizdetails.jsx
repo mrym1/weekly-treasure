@@ -27,7 +27,7 @@ const Quizdetails = () => {
   };
 
   const [data, setData] = useState([]);
-  const [questionId, setQuestionId] = useState("");
+  const [questionId, setQuestionId] = useState(null);
   const [dataForm, setDataForm] = useState(initialState);
   const [showModal, setShowModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -140,11 +140,11 @@ const Quizdetails = () => {
     e.preventDefault();
     console.log("handleAdd");
     try {
-      if (file == null && questionId == "") {
+      if (file == null && questionId == null) {
         dataForm.picture = "";
       }
       dataForm.hint = parseInt(dataForm.hint);
-      if (questionId == "") {
+      if (questionId == null) {
         console.log("adding");
         await addDoc(collection(db, `quiz/${quizId}/questions`), {
           ...dataForm,
@@ -156,6 +156,7 @@ const Quizdetails = () => {
       }
       setDataForm(initialState);
       setFile(null);
+      setImageProgress(null)
       setImageProgress(null);
       handleClose();
     } catch (err) {
@@ -326,7 +327,7 @@ const Quizdetails = () => {
 
 
       <div className="table_header">
-        <h2>Available Quizes</h2>
+        <h2>Questions</h2>
         <Button variant="outlined" onClick={addQuestionModel}>
         + Add Question
       </Button>

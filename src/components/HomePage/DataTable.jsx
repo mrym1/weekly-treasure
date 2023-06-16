@@ -4,6 +4,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import Switch from '@mui/material/Switch';
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -104,9 +105,9 @@ const Datatable = () => {
   const handleEdit = (doc) => {
     console.log("edit calling");
     setQuizId(doc.id);
-    formData.startAt = doc.startAt.toDate().toISOString().slice(0, -1);
-    formData.endAt = doc.endAt.toDate().toISOString().slice(0, -1);
-    formData.quiz = doc.quiz.toDate().toISOString().slice(0, -1);
+    formData.startAt =new Date(doc.startAt.toDate().getTime() - (doc.startAt.toDate().getTimezoneOffset() * 60000)).toISOString().slice(0, -1);
+    formData.endAt =new Date(doc.endAt.toDate().getTime() - (doc.endAt.toDate().getTimezoneOffset() * 60000)).toISOString().slice(0, -1);
+    formData.quiz = new Date(doc.quiz.toDate().getTime() - (doc.quiz.toDate().getTimezoneOffset() * 60000)).toISOString().slice(0, -1);  
     formData.fee = doc.fee.toString();
     formData.percentage = doc.percentage.toString();
     formData.prize = doc.prize.toString();
@@ -126,6 +127,14 @@ const Datatable = () => {
     handleClickOpen();
   };
   console.log(formData);
+
+  const handleChangeSwitch = async (docId,value) => {
+    console.log(docId);
+    await updateDoc(doc(db, "quiz", docId), {
+      active:value
+    });
+  };
+
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -213,6 +222,18 @@ const Datatable = () => {
     },
   ];
   const actionColumn = [
+    {
+      field: "Active",
+      headerName: "Active",
+      width: 200,
+      renderCell: (params) => {
+        return (
+          <div className="cellAction">
+            <Switch checked={params.row.active} onChange={()=>handleChangeSwitch(params.row.id,!params.row.active)}/>
+          </div>
+        );
+      },
+    },
     {
       field: "action",
       headerName: "Action",
