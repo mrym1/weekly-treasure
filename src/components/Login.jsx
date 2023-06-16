@@ -19,9 +19,8 @@ function Login() {
     const storedEmail = localStorage.getItem("email");
     const storedPassword = localStorage.getItem("password");
 
-    if (storedEmail && storedPassword) {
-      setEmail(storedEmail);
-      setPassword(storedPassword);
+    if (storedEmail!=null|| storedPassword!=null) {
+      return navigate("/");
     }
   }, []);
 

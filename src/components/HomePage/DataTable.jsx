@@ -42,13 +42,12 @@ const Datatable = () => {
   ///     Checking if user credentails are in local storage or not
   ///
   /////////////////////////////////
-
   const email = localStorage.getItem("email");
   const password = localStorage.getItem("password");
 
   useEffect(() => {
     // Navigate to a different page after the component has mounted
-    if (email == null && password == null) {
+    if (email == null || password == null) {
       {
         return navigate("/login");
       }
