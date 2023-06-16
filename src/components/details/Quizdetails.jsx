@@ -1,19 +1,21 @@
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import { DataGrid } from "@mui/x-data-grid";
+import DialogActions from '@mui/material/DialogActions';
 import {
   addDoc,
   collection,
   deleteDoc,
   doc,
   onSnapshot,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React, { useEffect, useState } from "react";
+import "../HomePage/datatable.scss";
 import { useNavigate, useParams } from "react-router-dom";
 import { db, storage } from "../../firebase";
 import "../HomePage/datatable.css";
@@ -24,7 +26,6 @@ const Quizdetails = () => {
     answer: "",
     hint: "",
   };
-  
 
   const [data, setData] = useState([]);
   const [questionId, setQuestionId] = useState("");
@@ -47,7 +48,6 @@ const Quizdetails = () => {
   const onAddImage = (file) => {
     setFile(file);
     uploadFile(file);
-     
   };
 
   const navigate = useNavigate();
@@ -98,7 +98,7 @@ const Quizdetails = () => {
       dataForm.question = doc.question;
       dataForm.answer = doc.answer;
       dataForm.hint = doc.hint;
-      handleClickOpen()
+      handleClickOpen();
     } catch (err) {
       console.log(err);
     }
@@ -134,18 +134,18 @@ const Quizdetails = () => {
       }
     );
   };
-  
+
   console.log(dataForm);
   const handleAdd = async (e) => {
     e.preventDefault();
     console.log("handleAdd");
     try {
-      if (file == null && questionId=="") {
-        dataForm.picture="";
+      if (file == null && questionId == "") {
+        dataForm.picture = "";
       }
       dataForm.hint = parseInt(dataForm.hint);
       if (questionId == "") {
-        console.log('adding')
+        console.log("adding");
         await addDoc(collection(db, `quiz/${quizId}/questions`), {
           ...dataForm,
         });
@@ -157,7 +157,7 @@ const Quizdetails = () => {
       setDataForm(initialState);
       setFile(null);
       setImageProgress(null);
-      handleClose()
+      handleClose();
     } catch (err) {
       console.log(err);
     }
@@ -166,29 +166,33 @@ const Quizdetails = () => {
     {
       field: "picture",
       headerName: "Image",
-      width: 150,
-      rowHeight:80,
+      width: 250,
+      rowHeight: 80,
       renderCell: (params) => {
         return (
-          <img style={{width:50,height:50}} src={params.row.picture|| null} />
+          <img
+            style={{ width: 50, height: 50 }}
+            src={params.row.picture || null}
+          />
         );
       },
     },
     {
       field: "question",
       headerName: "Question",
-      flex:1
+      width: 250,
     },
     {
       field: "answer",
       headerName: "Answer",
-      flex:0.5
+      width: 250,
     },
-     
+
     {
       field: "hint",
       headerName: "Hint",
-    }
+      width: 250,
+    },
   ];
   const actionColumn = [
     {
@@ -197,152 +201,138 @@ const Quizdetails = () => {
       width: 200,
       renderCell: (params) => {
         return (
-                <td>
-                  <button onClick={() => handleEdit(params.row)}>
-                    <i className="fa-solid fa-edit"></i>
-                  </button>
-                  <button onClick={() => handleDelete(params.row.id)}>
-                    <i className="fa-solid fa-trash"></i>
-                  </button>
-                </td>
+          <div className="cellAction">
+            <div className="viewButton" onClick={() => handleEdit(params.row)}>
+              Edit
+            </div>
+
+            <div
+              className="deleteButton"
+              onClick={() => handleDelete(params.row.id)}
+            >
+              Delete
+            </div>
+          </div>
         );
       },
     },
   ];
   return (
-    <div  className="table">
+    <div className="table">
       <div className="page_header">
         <h1>Quiz Details</h1>
-        <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Use Google's location service?"}
-        </DialogTitle>
-        <DialogContent>
-        {(
-            <div
-              id="authentication-modal"
-              tabIndex="-1"
-              aria-hidden="true"
-              className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full p-6 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
-            >
-              <div className="relative w-full max-w-md max-h-full">
-                <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                  <div className="register">
-                    <div className="container">
-                      <div className="title">{questionId == ""?'Add Question':'Edit Question'}</div>
-                      <div className="content">
-                        <form onSubmit={handleAdd}>
-                          <div className="content">
-                            <div className="upload">
-                              <div className="upload-card">
-                                <div id="preview">
-                                  <img
-                                    src={dataForm.picture || require("./add.jpg")}
-                                    id="image"
-                                    alt="Thumbnail"
-                                    className="user-post"
-                                  />
-                                </div>
-                              </div>
-                             
-                              <div className="round">
-                                <input
-                                  type="file"
-                                  accept="image"
-                                  id="file"
-                                  onChange={(e) =>
-                                    onAddImage(e.target.files[0])
-                                  }
-                                />
-                                <i className="fa fa-camera"></i>
-                              </div>
-                             
-                            </div>
-                            {
-                             imageProgress>0 &&
-                            <p style={{marginTop:20,textAlign:"center",fontSize:13}}>Uploaded {Math.round(imageProgress) }%</p>
-                            }
-                            <div className="user-details">
-                              <div className="input-box">
-                                <span className="details">Question</span>
-                                <input
-                                  id="question"
-                                  type="text"
-                                  value={dataForm.question}
-                                  placeholder="Enter a Question"
-                                  required
-                                  onChange={handleChange}
-                                />
-                              </div>
-
-                              <div className="input-box">
-                                <span className="details">Answer</span>
-                                <input
-                                  id="answer"
-                                  type="text"
-                                  value={dataForm.answer}
-                                  placeholder="Enter Answer"
-                                  required
-                                  onChange={handleChange}
-                                />
-                              </div>
-                              <div className="input-box">
-                                <span className="details">Hint</span>
-                                <input
-                                  id="hint"
-                                  type="number"
-                                  placeholder="hint"
-                                  value={dataForm.hint}
-                                  //   min="0"
-                                  required
-                                  onChange={(e) => handleChange(e)}
-                                />
-                              </div>
-                            </div>
-                            <div className="button">
-                              <input
-                                disabled={imageProgress !== null && imageProgress < 100}
-                                type="submit"
-                                value={questionId == "" ? "Add" : "Update"}
-                                /> 
-                              </div>
-                              <Button onClick={handleClose}>Cancel</Button>
-                            
-                          </div>
-                        </form>
-                      </div>
+       
+        <Dialog fullWidth={true} open={open} onClose={handleClose}>
+          <DialogTitle>
+            {questionId == null ? "Add Question" : "Edit Question"}
+          </DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleAdd}>
+              <div className="content">
+                <div className="upload">
+                  <div className="upload-card">
+                    <div id="preview">
+                      <img
+                        src={dataForm.picture || require("./add.jpg")}
+                        id="image"
+                        alt="Thumbnail"
+                        className="user-post"
+                      />
                     </div>
                   </div>
+
+                  <div className="round">
+                    <input
+                      type="file"
+                      accept="image"
+                      id="file"
+                      onChange={(e) => onAddImage(e.target.files[0])}
+                    />
+                    <i className="fa fa-camera"></i>
+                  </div>
                 </div>
+                {imageProgress > 0 && (
+                  <p
+                    style={{
+                      marginTop: 20,
+                      textAlign: "center",
+                      fontSize: 13,
+                    }}
+                  >
+                    Uploaded {Math.round(imageProgress)}%
+                  </p>
+                )}
+                <div className="user-details">
+                  <div className="input-box">
+                    <span className="details">Question</span>
+                    <input
+                      id="question"
+                      type="text"
+                      value={dataForm.question}
+                      placeholder="Enter a Question"
+                      required
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="input-box">
+                    <span className="details">Answer</span>
+                    <input
+                      id="answer"
+                      type="text"
+                      value={dataForm.answer}
+                      placeholder="Enter Answer"
+                      required
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="input-box">
+                    <span className="details">Hint</span>
+                    <input
+                      id="hint"
+                      type="number"
+                      placeholder="hint"
+                      min={1}
+                      max={3}
+                      value={dataForm.hint}
+                      //   min="0"
+                      required
+                      onChange={(e) => handleChange(e)}
+                    />
+                  </div>
+                </div>
+                {/* <div className="button">
+                  <input
+                    disabled={imageProgress !== null && imageProgress < 100}
+                    type="submit"
+                    value={questionId == "" ? "Add" : "Update"}
+                  />
+                </div> */}
+                <DialogActions>
+                  <Button onClick={handleClose}>Cancel</Button>
+                  <Button
+                    disabled={imageProgress !== null && imageProgress < 100}
+                    type="submit"
+                  >
+                    Submit
+                  </Button>
+                </DialogActions>
               </div>
-            </div>
-          )}
-        </DialogContent>
-         
-      </Dialog>
-          
-        </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
       {/* </div> */}
 
+
       <div className="table_header">
-        <h3>Questions</h3>
-        <div>
-          <button
-            onClick={addQuestionModel}
-            className="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            type="button"
-          >
-            Add Question
-          </button>
-          </div>
+        <h2>Available Quizes</h2>
+        <Button variant="outlined" onClick={addQuestionModel}>
+        + Add Question
+      </Button>
       </div>
-      <Box sx={{ width: '100%' }}>
-      <DataGrid
+      <Box  className="datatable">
+        <DataGrid
           autoHeight
           rowHeight={80}
           rows={data}
@@ -351,8 +341,7 @@ const Quizdetails = () => {
           pageSize={10}
           rowsPerPageOptions={[]}
         />
-    </Box>
-       
+      </Box>
     </div>
   );
 };

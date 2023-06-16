@@ -1,9 +1,10 @@
-import React, { useState, useContext } from "react";
-import "./Style/form.css";
+import React, { useState, useContext, useEffect } from "react";
+// import "./Style/form.css";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from "../context/AuthContext";
 import { auth } from "../firebase";
+import { TextField, Button, Box, Typography } from "@mui/material";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -13,76 +14,145 @@ function Login() {
   const navigate = useNavigate();
   const { dispatch } = useContext(AuthContext);
 
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    const storedPassword = localStorage.getItem("password");
+
+    if (storedEmail && storedPassword) {
+      setEmail(storedEmail);
+      setPassword(storedPassword);
+    }
+  }, []);
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   localStorage.setItem('email', email);
+  //   localStorage.setItem('password', password);
+  //   setError("");
+  //   try {
+  //     await signInWithEmailAndPassword(auth, email, password).then(
+  //       (userCredential) => {
+  //         const user = userCredential.user;
+  //         dispatch({ type: "LOGIN", payload: user });
+  //         navigate("/home");
+  //         console.log(user);
+  //       }
+  //     );
+  //   } catch (err) {
+  //     setError(err.message);
+  //     // return(
+  //     //     <p>
+  //     //     {error && <alert>{error}</alert>}
+  //     //     </p>
+  //     // )
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    localStorage.setItem("email", email);
+    localStorage.setItem("password", password);
     setError("");
     try {
-       await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
-        const user = userCredential.user;
-        dispatch({type:"LOGIN", payload:user})
-        navigate("/home");
-        console.log(user);
-      })
+      await signInWithEmailAndPassword(auth, email, password).then(
+        (userCredential) => {
+          const user = userCredential.user;
+          dispatch({ type: "LOGIN", payload: user });
+          navigate("/");
+          console.log(user);
+        }
+      );
     } catch (err) {
       setError(err.message);
-      // return(
-      //     <p>
-      //     {error && <alert>{error}</alert>}
-      //     </p>
-      // )
     }
   };
 
-//   if(error){
-//     return(
-//         <p className="error">{error}</p>
-//     )
-//   }
-
+  //   if(error){
+  //     return(
+  //         <p className="error">{error}</p>
+  //     )
+  //   }
 
   return (
     <>
-      <div className="main_div">
-        <div className="box">
-          <h1>Tycoo</h1>
-          <p className="error">{error}</p>
-          <form>
-            <div className="inputBox">
-              <input
-                type="email"
-                name="email"
-                autoComplete="off"
-                placeholder="Email"
-                required
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              
-            </div>
-            <div className="inputBox">
-              <input
-                type="passworddpassword"
-                name="password"
-                autoComplete="off"
-                placeholder="Password"
-                required
-                onChange={(e) => setPassword(e.target.value)}
-              />
-               
-            </div>
-            <div className="text_forget">
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
+            maxWidth: "500px",
+            margin: "0 auto",
+            backgroundColor: "#f2f2f2",
+            padding: "2rem",
+            borderRadius: "5px",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Typography
+            variant="h3"
+            align="center"
+            sx={{ color: "rgb(147, 147, 244)" }}
+          >
+            Weekly Treasure
+          </Typography>
+          <Typography variant="body1" className="error" align="center">
+            {error}
+          </Typography>
+          <form></form>
+          <TextField
+            label="Email"
+            variant="outlined"
+            type="email"
+            fullWidth
+            name="email"
+            autoComplete="off"
+            required
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            label="Password"
+            variant="outlined"
+            type="password"
+            name="password"
+            autoComplete="off"
+            required
+            onChange={(e) => setPassword(e.target.value)}
+            fullWidth
+          />
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleSubmit}
+            sx={{ backgroundColor: "rgb(147, 147, 244)" }}
+          >
+            Login
+          </Button>
+        </Box>
+
+        {/* <div className="text_forget">
               <Link to="/forgotpassword">Forgot password?</Link>
             </div>
           </form>
-          <button onClick={handleSubmit}> Login </button>
-          {/* <link to='/phonesignup'>Signup withPhone</link> */}
-          <div className="text sign-up-text">
+          <button onClick={handleSubmit}> Login </button> */}
+        {/* <link to='/phonesignup'>Signup withPhone</link> */}
+        {/* <div className="text sign-up-text">
             Don't have an account?{" "}
             <label>
               <Link to="/signup">Sigup now</Link>
             </label>
           </div>
-        </div>
-      </div>
+        </div> */}
+      </Box>
     </>
   );
 }

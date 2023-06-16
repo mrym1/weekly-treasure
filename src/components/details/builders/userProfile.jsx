@@ -5,7 +5,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { db } from "../../firebase";
-import "../HomePage/datatable.css";
+// import "../HomePage/datatable.css";
 
 const Quizdetails = () => {
    

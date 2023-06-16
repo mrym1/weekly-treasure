@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Style/form.css";
+// import "./Style/form.css";
 import { Link, useNavigate } from "react-router-dom";
 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";

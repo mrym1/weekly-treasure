@@ -30,14 +30,14 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/home" element={<RequireAuth><Home/></RequireAuth>} />
-      <Route path="/datatable" element={<RequireAuth><DataTable/></RequireAuth>} />
+      {/* <Route path="/" element={<RequireAuth><Home/></RequireAuth>} /> */}
+      <Route path="/" element={<RequireAuth><DataTable/></RequireAuth>} />
       <Route path="/registeruser" element={<RequireAuth><RegisterUser/></RequireAuth>} />
       <Route path="/updateuser/:id" element={<RequireAuth><UpdateUser/></RequireAuth>} />
       <Route path="/detailquiz/:id" element={<RequireAuth><DetailQuiz/></RequireAuth>} />
       <Route path="/questions/:id" element={<RequireAuth><DetailQuiz/></RequireAuth>} />
       {/* <Route path="quiz/:id/newquestion/" element={<RequireAuth><NewQuestion/></RequireAuth>} /> */}
-      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgotpassword" element={<Forgotpassword />} />
     </Routes>

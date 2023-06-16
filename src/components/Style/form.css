@@ -5,14 +5,14 @@
   box-sizing: border-box;
 }
 
-.main_div {
+/* .main_div {
   width: 100%;
   height: 100vh;
   position: relative;
   font-family: "Poppins", sans-serif;
-}
+} */
 
-.box {
+/* .box {
   width: 400px;
   /* background: #03a9f4; */
   position: absolute;
@@ -21,6 +21,7 @@
   transform: translate(-50%, -50%);
   padding: 50px;
   border-radius: 10px;
+  color: rgb(147, 147, 244);
   background: rgba(255, 255, 255, 0.25);
   box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(4px);
@@ -33,7 +34,7 @@
   margin-bottom: 30px;
   color: black;
   text-align: center;
-}
+} */
 
 .box .inputBox {
   position: relative;
