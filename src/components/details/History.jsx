@@ -1,17 +1,31 @@
 import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
 import { DataGrid } from "@mui/x-data-grid";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { db } from "../../firebase";
 // import "../HomePage/datatable.css";
 
 const Quizdetails = () => {
   const [data, setData] = useState([]);
-
-  const navigate = useNavigate();
+  const [response, setResponse] = useState({});
   const { id } = useParams();
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = (doc) => {
+    setResponse(doc.response);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     const unsub = onSnapshot(
@@ -73,20 +87,52 @@ const Quizdetails = () => {
       renderCell: (params) => {
         return (
           <div className="cellAction">
-            <Button className="viewButton">View</Button>
+            <Button onClick={()=>handleClickOpen(params.row)} className="viewButton">View</Button>
           </div>
         );
       },
     },
   ];
   return (
-    <div className="table">
+    <div>
+
+      <Dialog
+        fullWidth={true}
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"User Response"}
+        </DialogTitle>
+        <DialogContent>
+        {Object.keys(response).map((keyName, i) => (
+    <div key={i}>
+            <Typography variant="h6">Question {i+1} :</Typography>
+             
+            {response[keyName].map(function(data) {
+             return (
+               <div style={{border: "1px solid grey", marginBottom: "5px", borderRadius: "5px"}}>
+                 <Typography sx={{ color: "grey", ml: "15px", fontSize: "20px"}}>
+              Answer:  <span style={{color: "black"}}>{data.answer}</span>
+             </Typography>
+              <Typography sx={{ color: "grey", ml: "15px"}}>
+              Time: <span style={{fontSize: "14px"}}>{data.timeStamp.toDate().toDateString()+" At "+data.timeStamp.toDate().toLocaleTimeString("en-US")}
+                   </span>
+                 </Typography>
+             </div>
+              )
+    })}
+    </div>
+      ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Done</Button>
+        </DialogActions>
+      </Dialog>
       <div className="page_header">
         <h1>History</h1>
-      </div>
-
-      <div className="table_header">
-        <h2>History</h2>
       </div>
       <Box className="datatable">
         <DataGrid
@@ -181,5 +227,6 @@ const UserEmail = (props) => {
 
   return data && <p> {data.winningEmail} </p>;
 };
+
 
 export default Quizdetails;

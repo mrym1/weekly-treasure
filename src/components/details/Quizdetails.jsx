@@ -1,10 +1,10 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
+import DialogActions from '@mui/material/DialogActions';
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { DataGrid } from "@mui/x-data-grid";
-import DialogActions from '@mui/material/DialogActions';
 import {
   addDoc,
   collection,
@@ -15,7 +15,6 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React, { useEffect, useState } from "react";
-import "../HomePage/datatable.scss";
 import { useNavigate, useParams } from "react-router-dom";
 import { db, storage } from "../../firebase";
 import "../HomePage/datatable.css";
@@ -56,6 +55,7 @@ const Quizdetails = () => {
   const addQuestionModel = () => {
     setDataForm(initialState);
     setFile(null);
+    setQuestionId(null);
     setImageProgress(null);
     handleClickOpen();
   };
