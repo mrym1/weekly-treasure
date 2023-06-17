@@ -14,12 +14,11 @@ function Login() {
   const navigate = useNavigate();
   const { dispatch } = useContext(AuthContext);
 
-
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
     const storedPassword = localStorage.getItem("password");
 
-    if (storedEmail!=null|| storedPassword!=null) {
+    if (storedEmail != null || storedPassword != null) {
       return navigate("/");
     }
   }, []);
@@ -50,8 +49,6 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem("email", email);
-    localStorage.setItem("password", password);
     setError("");
     try {
       await signInWithEmailAndPassword(auth, email, password).then(
@@ -60,18 +57,37 @@ function Login() {
           dispatch({ type: "LOGIN", payload: user });
           navigate("/");
           console.log(user);
+          localStorage.setItem("email", email);
+          localStorage.setItem("password", password);
         }
       );
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      // setError(err.message);
+
+      const errorCode = error.code;
+      let errorMessage;
+
+      switch (errorCode) {
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address.";
+          break;
+        case "auth/user-disabled":
+          errorMessage = "Your account has been disabled.";
+          break;
+        case "auth/user-not-found":
+          errorMessage = "User not found.";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "Invalid password.";
+          break;
+        default:
+          errorMessage = "An error occurred during authentication.";
+      }
+
+      // Display the error message to the user
+      setError(errorMessage);
     }
   };
-
-  //   if(error){
-  //     return(
-  //         <p className="error">{error}</p>
-  //     )
-  //   }
 
   return (
     <>
@@ -104,9 +120,6 @@ function Login() {
           >
             Weekly Treasure
           </Typography>
-          <Typography variant="body1" className="error" align="center">
-            {error}
-          </Typography>
           <form></form>
           <TextField
             label="Email"
@@ -128,6 +141,16 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
           />
+          {error && (
+            <Typography
+              variant="body1"
+              className="error"
+              align="center"
+              sx={{ color: "red" }}
+            >
+              {error}
+            </Typography>
+          )}
           <Button
             variant="contained"
             fullWidth

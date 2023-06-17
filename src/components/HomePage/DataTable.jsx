@@ -55,6 +55,13 @@ const Datatable = () => {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("email");
+    localStorage.removeItem("password");
+    return navigate("/login");
+
+  }
+
   useEffect(() => {
     const unsub = onSnapshot(
       collection(db, "quiz"),
@@ -380,9 +387,14 @@ const Datatable = () => {
 
       <div className="table_header" style={{marginTop: "40px"}}>
         <Typography variant="h5">Quizzes</Typography>
-        <Button variant="outlined" onClick={handleAddNew}>
+        <div>
+        <Button variant="outlined" onClick={handleAddNew} sx={{marginRight: "10px"}}>
           + Add New
         </Button>
+        <Button variant="outlined" onClick={handleLogout} color="error">
+          Logout
+        </Button>
+        </div>
       </div>
       <div className="datatable">
         <DataGrid
