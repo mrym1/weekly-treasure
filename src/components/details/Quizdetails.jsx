@@ -1,3 +1,4 @@
+import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -5,19 +6,20 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { DataGrid } from "@mui/x-data-grid";
-import { Typography } from "@mui/material";
-import { Link } from "react-router-dom";
 import {
+  Timestamp,
   addDoc,
   collection,
   deleteDoc,
   doc,
   onSnapshot,
+  orderBy,
+  query,
   updateDoc,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { db, storage } from "../../firebase";
 import "../HomePage/datatable.css";
 
@@ -78,8 +80,7 @@ const Quizdetails = () => {
   }, [id]);
   
   useEffect(() => {
-    const unsub = onSnapshot(
-      collection(db, `quiz/${id}/questions`),
+    const unsub = onSnapshot( query (collection(db, `quiz/${id}/questions`), orderBy("createdAt")),
       (snapShot) => {
         let list = [];
         snapShot.docs.forEach((doc) => {
@@ -165,6 +166,7 @@ const Quizdetails = () => {
         console.log("adding");
         await addDoc(collection(db, `quiz/${quizId}/questions`), {
           ...dataForm,
+          createdAt: Timestamp.fromDate(new Date())
         });
       } else {
         await updateDoc(doc(db, `quiz/${quizId}/questions/`, questionId), {

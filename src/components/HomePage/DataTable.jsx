@@ -4,7 +4,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import Switch from '@mui/material/Switch';
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -133,8 +132,7 @@ const Datatable = () => {
     weeLater.setMinutes(59)
     weeLater.setSeconds(0)
     weeLater.setDate(weeLater.getDate() + 7)
-    console.log(now)
-    console.log(weeLater)
+   
     formData.startAt =new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, -1);
     formData.endAt = new Date(weeLater.getTime() - (weeLater.getTimezoneOffset() * 60000)).toISOString().slice(0, -1); 
     formData.fee = "1"
@@ -259,18 +257,18 @@ const Datatable = () => {
     },
   ];
   const actionColumn = [
-    {
-      field: "Active",
-      headerName: "Active",
-      width: 200,
-      renderCell: (params) => {
-        return (
-          <div className="cellAction">
-            <Switch checked={params.row.active} onChange={()=>handleChangeSwitch(params.row.id,!params.row.active)}/>
-          </div>
-        );
-      },
-    },
+    // {
+    //   field: "Active",
+    //   headerName: "Active",
+    //   width: 200,
+    //   renderCell: (params) => {
+    //     return (
+    //       <div className="cellAction">
+    //         <Switch checked={params.row.active} onChange={()=>handleChangeSwitch(params.row.id,!params.row.active)}/>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       field: "action",
       headerName: "Action",
@@ -381,7 +379,7 @@ const Datatable = () => {
       </Dialog>
 
       <div className="table_header" style={{marginTop: "40px"}}>
-        <Typography variant="h5">Quizes</Typography>
+        <Typography variant="h5">Quizzes</Typography>
         <Button variant="outlined" onClick={handleAddNew}>
           + Add New
         </Button>
