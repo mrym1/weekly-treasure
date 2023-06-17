@@ -15,6 +15,12 @@
   /* height: auto; */
 }
 
+.top-row{
+  font-size: 15px;
+  display: flex;
+  margin-right: 10px;
+}
+
 .table_header {
   margin-top: 40px;
   display: flex;

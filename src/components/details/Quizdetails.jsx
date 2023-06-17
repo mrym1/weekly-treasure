@@ -26,11 +26,10 @@ const Quizdetails = () => {
     hint: "",
   };
 
+  const [quiz, setQuiz] = useState(null);
   const [data, setData] = useState([]);
   const [questionId, setQuestionId] = useState(null);
-  const [dataForm, setDataForm] = useState(initialState);
-  const [showModal, setShowModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [dataForm, setDataForm] = useState(initialState); 
   const { question, answer, hint } = dataForm;
   const [file, setFile] = useState(null);
   const [imageProgress, setImageProgress] = useState(null);
@@ -60,6 +59,22 @@ const Quizdetails = () => {
     handleClickOpen();
   };
 
+  useEffect(() => {
+    const docQuiz = onSnapshot(
+      doc(db, `quiz`,id),
+      (snapShot) => {
+        setQuiz(snapShot.data());
+        console.log("usama",snapShot.data());
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+    return () => {
+      docQuiz();
+    };
+  }, [id]);
+  
   useEffect(() => {
     const unsub = onSnapshot(
       collection(db, `quiz/${id}/questions`),
@@ -222,7 +237,14 @@ const Quizdetails = () => {
     <div className="table">
       <div className="page_header">
         <h1>Quiz Details</h1>
-       
+        {quiz!=null && <div className="top-row">
+          <p className="top-row"><span style={{fontWeight:"bold"}}>Start Date : </span> {convertDate(quiz.startAt)}</p>
+          <p className="top-row"><span style={{fontWeight:"bold"}}>End Date : </span>End Date: {convertDate(quiz.endAt)}  </p>
+          <p className="top-row"><span style={{fontWeight:"bold"}}>Fee : </span> {quiz.fee}  </p>
+          <p className="top-row"><span style={{fontWeight:"bold"}}>percentage : </span> {quiz.percentage}  </p>
+          <p className="top-row"><span style={{fontWeight:"bold"}}>Prize : </span> {quiz.prize}  </p>
+        
+        </div>}
         <Dialog fullWidth={true} open={open} onClose={handleClose}>
           <DialogTitle>
             {questionId == null ? "Add Question" : "Edit Question"}
@@ -345,6 +367,14 @@ const Quizdetails = () => {
       </Box>
     </div>
   );
+
+  function convertDate(date) {
+    return  <div>
+    {date.toDate().toDateString() +
+      "\n At \n" +
+      date.toDate().toLocaleTimeString("en-US")}
+  </div>
+  }
 };
 
 export default Quizdetails;

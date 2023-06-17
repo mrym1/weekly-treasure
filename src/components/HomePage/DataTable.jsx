@@ -6,6 +6,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Switch from '@mui/material/Switch';
 import { DataGrid } from "@mui/x-data-grid";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./datatable.css";
@@ -123,16 +124,34 @@ const Datatable = () => {
   };
   const handleAddNew = () => {
     setQuizId(null);
-    setFormData(initialState);
+    var now = new Date();
+    now.setHours(23)
+    now.setMinutes(59)
+    now.setSeconds(0)
+    var weeLater = new Date();
+    weeLater.setHours(23)
+    weeLater.setMinutes(59)
+    weeLater.setSeconds(0)
+    weeLater.setDate(weeLater.getDate() + 7)
+    console.log(now)
+    console.log(weeLater)
+    formData.startAt =new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, -1);
+    formData.endAt = new Date(weeLater.getTime() - (weeLater.getTimezoneOffset() * 60000)).toISOString().slice(0, -1); 
+    formData.fee = "1"
+    formData.percentage = "30"
+    formData.prize = "500"
     handleClickOpen();
   };
   console.log(formData);
 
   const handleChangeSwitch = async (docId,value) => {
-    console.log(docId);
     await updateDoc(doc(db, "quiz", docId), {
       active:value
     });
+    if (value) {
+      
+      setNotification(docId);
+    }
   };
 
 
@@ -153,6 +172,8 @@ const Datatable = () => {
           ...formData,
           winner: "",
           active: false,
+        }).then((doc) => {
+          setNotification(doc.id);
         });
       } else {
         console.log(formData);
@@ -160,12 +181,28 @@ const Datatable = () => {
         await updateDoc(doc(db, "quiz", quizId), {
           ...formData,
         });
+        setNotification(quizId);
       }
       handleClose();
     } catch (err) {
       console.log(err);
     }
   };
+  async function setNotification(data) {
+    axios
+      .post('https://us-central1-weekly-treasure-4c3b5.cloudfunctions.net/scheduleNotification', {
+         id: data, 
+      },{
+        headers: {
+          "Access-Control-Allow-Headers": "*",
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then((d)=>{
+        console.log(d);
+      })
+
+}
 
   const userColumns = [
     {
@@ -344,7 +381,7 @@ const Datatable = () => {
       </Dialog>
 
       <div className="table_header" style={{marginTop: "40px"}}>
-        <Typography variant="h5">Available Quizes</Typography>
+        <Typography variant="h5">Quizes</Typography>
         <Button variant="outlined" onClick={handleAddNew}>
           + Add New
         </Button>
