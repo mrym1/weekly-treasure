@@ -169,7 +169,7 @@ const Datatable = () => {
         await addDoc(collection(db, "quiz"), {
           ...formData,
           winner: "",
-          active: false,
+          active: true,
         }).then((doc) => {
           setNotification(doc.id);
         });
