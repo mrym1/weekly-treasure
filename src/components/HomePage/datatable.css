@@ -215,8 +215,7 @@ tr:hover td{
   cursor: pointer;
 }
 
-.datatable {
-  height: 350px;
+.datatable { 
   padding: 20px;
 }
 

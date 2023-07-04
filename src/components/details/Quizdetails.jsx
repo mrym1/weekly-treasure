@@ -28,6 +28,7 @@ const Quizdetails = () => {
     question: "",
     answer: "",
     hint: "",
+    picture:""
   };
 
   const [quiz, setQuiz] = useState(null);
@@ -143,6 +144,7 @@ const Quizdetails = () => {
         setImageProgress(progress);
       },
       (error) => {
+
         console.log(error);
       },
       () => {
@@ -159,6 +161,9 @@ const Quizdetails = () => {
     console.log("handleAdd");
     try {
       if (file == null && questionId == null) {
+        dataForm.picture = "";
+      }
+      if (dataForm.picture == null || dataForm.picture == undefined) {
         dataForm.picture = "";
       }
       dataForm.hint = parseInt(dataForm.hint);
@@ -360,9 +365,10 @@ const Quizdetails = () => {
         + Add Question
       </Button>
       </div>
-      <Box  className="datatable">
+      <Box sx={{ height: 500, width: '100%' }} className="datatable">
+        
         <DataGrid
-          autoHeight
+          
           rowHeight={80}
           rows={data}
           getRowId={(row) => row.id}

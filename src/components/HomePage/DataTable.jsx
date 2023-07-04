@@ -18,6 +18,8 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
+  orderBy,
+  query,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -64,7 +66,7 @@ const Datatable = () => {
 
   useEffect(() => {
     const unsub = onSnapshot(
-      collection(db, "quiz"),
+      query (collection(db, `quiz`), orderBy("quiz","desc")),
       (snapShot) => {
         let list = [];
         snapShot.docs.forEach((doc) => {
@@ -133,13 +135,12 @@ const Datatable = () => {
     var now = new Date();
     now.setHours(23)
     now.setMinutes(59)
-    now.setSeconds(0)
+    now.setSeconds(0,0)
     var weeLater = new Date();
     weeLater.setHours(23)
     weeLater.setMinutes(59)
-    weeLater.setSeconds(0)
+    weeLater.setSeconds(0,0)
     weeLater.setDate(weeLater.getDate() + 7)
-   
     formData.startAt =new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, -1);
     formData.endAt = new Date(weeLater.getTime() - (weeLater.getTimezoneOffset() * 60000)).toISOString().slice(0, -1); 
     formData.fee = "1"
@@ -170,13 +171,15 @@ const Datatable = () => {
       formData.fee = parseInt(formData.fee);
       formData.percentage = parseInt(formData.percentage);
       formData.prize = parseInt(formData.prize);
+      var previousDate = new Date();
+      previousDate.setDate(previousDate.getDate() - 5);
 
       if (quizId == null) {
         console.log("adding new");
         await addDoc(collection(db, "quiz"), {
           ...formData,
           winner: "",
-          active: true,
+          lastDate: Timestamp.fromDate(previousDate),
         }).then((doc) => {
           setNotification(doc.id);
         });
@@ -188,7 +191,7 @@ const Datatable = () => {
         });
         setNotification(quizId);
       }
-      handleClose();
+      
     } catch (err) {
       console.log(err);
     }
@@ -206,7 +209,20 @@ const Datatable = () => {
       }).then((d)=>{
         console.log(d);
       })
-
+    // axios
+    // .post('http://127.0.0.1:5001/weekly-treasure-4c3b5/us-central1/scheduleNotification', {
+    //   id: data, 
+    //   },{
+    //     headers: {
+    //       "Access-Control-Allow-Headers": "*",
+    //       'Access-Control-Allow-Origin': '*',
+    //       'Content-Type': 'application/x-www-form-urlencoded'
+    //     }
+    //   }).then((d)=>{
+    //     console.log(d);
+    //   })
+      
+      handleClose();
 }
 
   const userColumns = [

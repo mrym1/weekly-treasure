@@ -14,13 +14,20 @@ import { db } from "../../firebase";
 
 const Quizdetails = () => {
   const [data, setData] = useState([]);
-  const [response, setResponse] = useState({});
+  const [response, setResponse] = useState([]);
   const { id } = useParams();
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = (doc) => {
-    setResponse(doc.response);
-    setOpen(true);
+    try {
+    
+      
+      setResponse(doc.response);
+      setOpen(true);
+      
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const handleClose = () => {
@@ -33,10 +40,9 @@ const Quizdetails = () => {
       (snapShot) => {
         let list = [];
         snapShot.docs.forEach((doc) => {
-          list.push({ id: doc.id, ...doc.data() });
+          list.push({ id: doc.id, ...doc.data() }); 
         });
         setData(list);
-        console.log(data);
       },
       (error) => {
         console.log(error);
@@ -107,13 +113,16 @@ const Quizdetails = () => {
           {"User Response"}
         </DialogTitle>
         <DialogContent>
-        {Object.keys(response).map((keyName, i) => (
-    <div key={i}>
-            <Typography variant="h6">Question {i+1} :</Typography>
-             
-            {response[keyName].map(function(data) {
+        {response.map((i) => (
+    <div>
+            <Typography variant="h6">Question {i.no+1} :</Typography>
+            <div style={{border: "1px solid grey", marginBottom: "5px", borderRadius: "5px"}}>
+            <Typography sx={{ color: "grey", ml: "15px", fontSize: "20px"}}>
+              Question:  <span style={{color: "black"}}>{i.question}</span>
+             </Typography>
+            {i.answers.map(function (data) {
              return (
-               <div style={{border: "1px solid grey", marginBottom: "5px", borderRadius: "5px"}}>
+              <div>
                  <Typography sx={{ color: "grey", ml: "15px", fontSize: "20px"}}>
               Answer:  <span style={{color: "black"}}>{data.answer}</span>
              </Typography>
@@ -121,11 +130,14 @@ const Quizdetails = () => {
               Time: <span style={{fontSize: "14px"}}>{data.timeStamp.toDate().toDateString()+" At "+data.timeStamp.toDate().toLocaleTimeString("en-US")}
                    </span>
                  </Typography>
-             </div>
+                 </div>
+           
               )
     })}
+                </div>
     </div>
       ))}
+      
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Done</Button>
