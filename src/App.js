@@ -6,6 +6,7 @@ import Signup from "./components/Signup";
 // import PhoneAuth from "./components/PhoneAuth";
 import Home from "./components/Home";
 import Forgotpassword from "./components/Forgotpassword";
+import Notification from './components/notification/Notification'
 import Otp from "./components/Otp";
 import DataTable from "./components/HomePage/DataTable";
 import RegisterUser from "./components/HomePage/RegisterUser";
@@ -36,6 +37,7 @@ function App() {
       <Route path="/updateuser/:id" element={<RequireAuth><UpdateUser/></RequireAuth>} />
       <Route path="/detailquiz/:id" element={<RequireAuth><DetailQuiz/></RequireAuth>} />
       <Route path="/questions/:id" element={<RequireAuth><DetailQuiz/></RequireAuth>} />
+      <Route path="/notification" element={<RequireAuth><Notification/></RequireAuth>} />
       {/* <Route path="quiz/:id/newquestion/" element={<RequireAuth><NewQuestion/></RequireAuth>} /> */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />

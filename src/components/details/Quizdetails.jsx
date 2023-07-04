@@ -243,13 +243,12 @@ const Quizdetails = () => {
     },
   ];
   return (
-    <div className="table">
+    <div className="">
       <div className="page_header">
         <div style={{display: "flex", justifyContent: "space-between", my:"5px"}}>
-        <h1>Quiz Details</h1>
-        <Link to="/"><Typography sx={{color: "red", textDecoration: "underline", mx: "40px", my: "10px"}}>Back To List</Typography></Link>
+        <h1 className="text-black font-bold mb-4 underline text-4xl">Quiz Details</h1>
         </div>
-        {quiz!=null && <div className="top-row">
+        {quiz!=null && <div className="flex flex-col md:flex-row">
           <p className="top-row"><span style={{fontWeight:"bold"}}>Start Date : </span> {convertDate(quiz.startAt)}</p>
           <p className="top-row"><span style={{fontWeight:"bold"}}>End Date : </span>End Date: {convertDate(quiz.endAt)}  </p>
           <p className="top-row"><span style={{fontWeight:"bold"}}>Fee : </span> {quiz.fee}  </p>

@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 // import "./HomePage/datatable.css";
 import History from "./details/History";
 import Quizdetails from "./details/Quizdetails";
+import Sidebar from "./sidebar/Sidebar";
+import Winner from "./details/Winner";
 
 const DetailPage = () => {
-
   const navigate = useNavigate();
 
-   /////////////////////////////////
+  /////////////////////////////////
   ///
   ///     Checking if user credentails are in local storage or not
   ///
@@ -26,11 +27,16 @@ const DetailPage = () => {
     }
   }, []);
 
-
   return (
-    <div>
-      <Quizdetails />
-      <History/>
+    <div className="flex">
+      <div className="fixed h-screen">
+        <Sidebar />
+      </div>
+      <div className="md:ml-64 ml-6 flex-1 overflow-y-auto">
+        <Winner />
+        <Quizdetails />
+        <History />
+      </div>
     </div>
   );
 };

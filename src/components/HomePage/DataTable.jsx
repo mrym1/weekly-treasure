@@ -23,6 +23,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import Sidebar from "../sidebar/Sidebar";
 
 const Datatable = () => {
   const [data, setData] = useState([]);
@@ -57,16 +58,15 @@ const Datatable = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("email");
-    localStorage.removeItem("password");
-    return navigate("/login");
-
-  }
+  // const handleLogout = () => {
+  //   localStorage.removeItem("email");
+  //   localStorage.removeItem("password");
+  //   return navigate("/login");
+  // };
 
   useEffect(() => {
     const unsub = onSnapshot(
-      query (collection(db, `quiz`), orderBy("quiz","desc")),
+      query(collection(db, `quiz`), orderBy("quiz", "desc")),
       (snapShot) => {
         let list = [];
         snapShot.docs.forEach((doc) => {
@@ -114,9 +114,24 @@ const Datatable = () => {
   const handleEdit = (doc) => {
     console.log("edit calling");
     setQuizId(doc.id);
-    formData.startAt =new Date(doc.startAt.toDate().getTime() - (doc.startAt.toDate().getTimezoneOffset() * 60000)).toISOString().slice(0, -1);
-    formData.endAt =new Date(doc.endAt.toDate().getTime() - (doc.endAt.toDate().getTimezoneOffset() * 60000)).toISOString().slice(0, -1);
-    formData.quiz = new Date(doc.quiz.toDate().getTime() - (doc.quiz.toDate().getTimezoneOffset() * 60000)).toISOString().slice(0, -1);  
+    formData.startAt = new Date(
+      doc.startAt.toDate().getTime() -
+        doc.startAt.toDate().getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .slice(0, -1);
+    formData.endAt = new Date(
+      doc.endAt.toDate().getTime() -
+        doc.endAt.toDate().getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .slice(0, -1);
+    formData.quiz = new Date(
+      doc.quiz.toDate().getTime() -
+        doc.quiz.toDate().getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .slice(0, -1);
     formData.fee = doc.fee.toString();
     formData.percentage = doc.percentage.toString();
     formData.prize = doc.prize.toString();
@@ -133,33 +148,37 @@ const Datatable = () => {
   const handleAddNew = () => {
     setQuizId(null);
     var now = new Date();
-    now.setHours(23)
-    now.setMinutes(59)
-    now.setSeconds(0,0)
+    now.setHours(23);
+    now.setMinutes(59);
+    now.setSeconds(0, 0);
     var weeLater = new Date();
-    weeLater.setHours(23)
-    weeLater.setMinutes(59)
-    weeLater.setSeconds(0,0)
-    weeLater.setDate(weeLater.getDate() + 7)
-    formData.startAt =new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, -1);
-    formData.endAt = new Date(weeLater.getTime() - (weeLater.getTimezoneOffset() * 60000)).toISOString().slice(0, -1); 
-    formData.fee = "1"
-    formData.percentage = "30"
-    formData.prize = "500"
+    weeLater.setHours(23);
+    weeLater.setMinutes(59);
+    weeLater.setSeconds(0, 0);
+    weeLater.setDate(weeLater.getDate() + 7);
+    formData.startAt = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, -1);
+    formData.endAt = new Date(
+      weeLater.getTime() - weeLater.getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .slice(0, -1);
+    formData.fee = "1";
+    formData.percentage = "30";
+    formData.prize = "500";
     handleClickOpen();
   };
   console.log(formData);
 
-  const handleChangeSwitch = async (docId,value) => {
+  const handleChangeSwitch = async (docId, value) => {
     await updateDoc(doc(db, "quiz", docId), {
-      active:value
+      active: value,
     });
     if (value) {
-      
       setNotification(docId);
     }
   };
-
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -191,27 +210,31 @@ const Datatable = () => {
         });
         setNotification(quizId);
       }
-      
     } catch (err) {
       console.log(err);
     }
   };
   async function setNotification(data) {
     axios
-      .post('https://us-central1-weekly-treasure-4c3b5.cloudfunctions.net/scheduleNotification', {
-         id: data, 
-      },{
-        headers: {
-          "Access-Control-Allow-Headers": "*",
-          'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/x-www-form-urlencoded'
+      .post(
+        "https://us-central1-weekly-treasure-4c3b5.cloudfunctions.net/scheduleNotification",
+        {
+          id: data,
+        },
+        {
+          headers: {
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         }
-      }).then((d)=>{
+      )
+      .then((d) => {
         console.log(d);
-      })
+      });
     // axios
     // .post('http://127.0.0.1:5001/weekly-treasure-4c3b5/us-central1/scheduleNotification', {
-    //   id: data, 
+    //   id: data,
     //   },{
     //     headers: {
     //       "Access-Control-Allow-Headers": "*",
@@ -221,9 +244,9 @@ const Datatable = () => {
     //   }).then((d)=>{
     //     console.log(d);
     //   })
-      
-      handleClose();
-}
+
+    handleClose();
+  }
 
   const userColumns = [
     {
@@ -322,106 +345,114 @@ const Datatable = () => {
   ];
 
   return (
-    <div>
-      <Dialog
-        fullWidth={true}
-        open={open}
-        onClose={handleClose}
-      >
-        <DialogTitle>
-          {" "}
-          {quizId == null ? "Add New Quiz" : "Edit Quiz"}
-        </DialogTitle>
-        <DialogContent
-        >
-          <form onSubmit={handleAdd}>
-            <div className="user-details">
-              <div className="input-box">
-                <span className="details">Start Date</span>
-                <input
-                  id="startAt"
-                  value={formData.startAt}
-                  type="datetime-local"
-                  required
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="input-box">
-                <span className="details">End Date</span>
-                <input
-                  id="endAt"
-                  value={formData.endAt}
-                  type="datetime-local"
-                  required
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="input-box">
-                <span className="details">Fee</span>
-                <input
-                  id="fee"
-                  value={formData.fee}
-                  type="number"
-                  placeholder="0"
-                  required
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="input-box">
-                <span className="details">Percentage</span>
-                <input
-                  id="percentage"
-                  type="number"
-                  value={formData.percentage}
-                  placeholder="0"
-                  required
-                  onChange={(e) => {
-                    handleChange(e);
-                  }}
-                />
-              </div>
-              <div className="input-box">
-                <span className="details">Prize</span>
-                <input
-                  id="prize"
-                  value={formData.prize}
-                  type="number"
-                  placeholder="0"
-                  required
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-            <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
-              <Button type="submit">Submit</Button>
-            </DialogActions>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <div className="table_header" style={{marginTop: "40px"}}>
-        <Typography variant="h5">Quizzes</Typography>
-        <div>
-        <Button variant="outlined" onClick={handleAddNew} sx={{marginRight: "10px"}}>
-          + Add New
-        </Button>
-        <Button variant="outlined" onClick={handleLogout} color="error">
-          Logout
-        </Button>
-        </div>
+    <div className="flex">
+      <div>
+        <Sidebar />
       </div>
-      <div className="datatable">
-        <DataGrid
-          autoHeight
-          rowHeight={60}
-          rows={data}
-          getRowId={(row) => row.id}
-          columns={userColumns.concat(actionColumn)}
-          pageSize={10}
-          rowsPerPageOptions={[]}
-        />
+      <div className=" w-full">
+        <Dialog fullWidth={true} open={open} onClose={handleClose}>
+          <DialogTitle>
+            {" "}
+            {quizId == null ? "Add New Quiz" : "Edit Quiz"}
+          </DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleAdd}>
+              <div className="user-details">
+                <div className="input-box">
+                  <span className="details">Start Date</span>
+                  <input
+                    id="startAt"
+                    value={formData.startAt}
+                    type="datetime-local"
+                    required
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="input-box">
+                  <span className="details">End Date</span>
+                  <input
+                    id="endAt"
+                    value={formData.endAt}
+                    type="datetime-local"
+                    required
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="input-box">
+                  <span className="details">Fee</span>
+                  <input
+                    id="fee"
+                    value={formData.fee}
+                    type="number"
+                    placeholder="0"
+                    required
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="input-box">
+                  <span className="details">Percentage</span>
+                  <input
+                    id="percentage"
+                    type="number"
+                    value={formData.percentage}
+                    placeholder="0"
+                    required
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                  />
+                </div>
+                <div className="input-box">
+                  <span className="details">Prize</span>
+                  <input
+                    id="prize"
+                    value={formData.prize}
+                    type="number"
+                    placeholder="0"
+                    required
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button type="submit">Submit</Button>
+              </DialogActions>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        <div className="table_header" style={{ marginTop: "40px" }}>
+          <h1
+            className="text-black font-bold mb-4 underline text-4xl"
+          >
+            Quizzes
+          </h1>
+          <div>
+            <Button
+              variant="outlined"
+              onClick={handleAddNew}
+              sx={{ marginRight: "10px" }}
+            >
+              + Add New
+            </Button>
+            {/* <Button variant="outlined" onClick={handleLogout} color="error">
+              Logout
+            </Button> */}
+          </div>
+        </div>
+        <div className="datatable">
+          <DataGrid
+            autoHeight
+            rowHeight={60}
+            rows={data}
+            getRowId={(row) => row.id}
+            columns={userColumns.concat(actionColumn)}
+            pageSize={10}
+            rowsPerPageOptions={[]}
+          />
+        </div>
       </div>
     </div>
   );

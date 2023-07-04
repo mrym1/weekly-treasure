@@ -144,7 +144,7 @@ const Quizdetails = () => {
         </DialogActions>
       </Dialog>
       <div className="page_header">
-        <h1>History</h1>
+        <h1 className="text-black font-bold mb-4 underline text-4xl">History</h1>
       </div>
       <Box className="datatable">
         <DataGrid
@@ -170,7 +170,7 @@ const UserImage = (props) => {
       (snapShot) => {
         setData(snapShot.data());
 
-        console.log(snapShot.data());
+        // console.log(snapShot.data());
       },
       (error) => {
         console.log(error);
@@ -202,7 +202,7 @@ const UserName = (props) => {
       (snapShot) => {
         setData(snapShot.data());
 
-        console.log(snapShot.data());
+        // console.log(snapShot.data());
       },
       (error) => {
         console.log(error);
@@ -225,7 +225,7 @@ const UserEmail = (props) => {
       (snapShot) => {
         setData(snapShot.data());
 
-        console.log(snapShot.data());
+        // console.log(snapShot.data());
       },
       (error) => {
         console.log(error);
