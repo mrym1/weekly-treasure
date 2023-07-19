@@ -36,16 +36,21 @@
   border-radius: 5px;
   background: linear-gradient(135deg, #71b7e6, #9774a5);
 }
-.content form .user-details {
+
+form .user-details{
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  margin: 20px 0 12px 0;
+  padding: 12px;
+  justify-content: center;
+  align-items: center;
 }
-form .user-details .input-box {
+
+.user-details .input-box {
   margin-bottom: 15px;
-  width: calc(100% / 2 - 20px);
+  width: 50%; /* Each input takes 50% of the container width */
+  padding: 0 10px; /* Optional: Add padding to the input box */
 }
+
 form .input-box span.details {
   display: block;
   font-weight: 500;

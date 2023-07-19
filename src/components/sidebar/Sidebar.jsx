@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FiBell, FiLogOut, FiX } from "react-icons/fi";
 import { MdOutlineQuiz, MdOutlineHome } from "react-icons/md";
+import { AiOutlineUser } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
@@ -13,7 +14,6 @@ const Sidebar = () => {
     localStorage.removeItem("password");
     return navigate("/login");
   };
-
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -65,25 +65,29 @@ const Sidebar = () => {
           </button>
         </div>
         <nav className="mt-10">
-            <Link to="/">
-          <p
-            className="flex items-center text-lg py-2 px-4 text-gray-200 hover:bg-gray-700 hover:bg-opacity-50 rounded"
-          >
-            <span className="mx-4">
-              <MdOutlineQuiz />
-            </span>
-            <span>Quizzes</span>
-          </p>
+          <Link to="/">
+            <p className="flex items-center text-lg py-2 px-4 text-gray-200 hover:bg-gray-700 hover:bg-opacity-50 rounded">
+              <span className="mx-4">
+                <MdOutlineQuiz />
+              </span>
+              <span>Quizzes</span>
+            </p>
+          </Link>
+          <Link to="/users">
+            <p className="flex items-center text-lg py-2 px-4 text-gray-200 hover:bg-gray-700 hover:bg-opacity-50 rounded">
+              <span className="mx-4">
+                <AiOutlineUser />
+              </span>
+              <span>User</span>
+            </p>
           </Link>
           <Link to="/notification">
-          <p
-            className="flex items-center text-lg py-2 px-4 text-gray-200 hover:bg-gray-700 hover:bg-opacity-50 rounded"
-          >
-            <span className="mx-4">
-              <FiBell />
-            </span>
-            <span>Notifications</span>
-          </p>
+            <p className="flex items-center text-lg py-2 px-4 text-gray-200 hover:bg-gray-700 hover:bg-opacity-50 rounded">
+              <span className="mx-4">
+                <FiBell />
+              </span>
+              <span>Notifications</span>
+            </p>
           </Link>
           <p
             className="flex items-center text-lg py-2 px-4 text-gray-200 hover:bg-gray-700 hover:bg-opacity-50 rounded"

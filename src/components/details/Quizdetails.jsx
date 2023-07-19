@@ -2,7 +2,7 @@ import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from '@mui/material/DialogActions';
+import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { DataGrid } from "@mui/x-data-grid";
@@ -28,17 +28,19 @@ const Quizdetails = () => {
     question: "",
     answer: "",
     hint: "",
-    picture:""
+    picture: "",
   };
 
   const [quiz, setQuiz] = useState(null);
   const [data, setData] = useState([]);
   const [questionId, setQuestionId] = useState(null);
-  const [dataForm, setDataForm] = useState(initialState); 
+  const [dataForm, setDataForm] = useState(initialState);
   const { question, answer, hint } = dataForm;
   const [file, setFile] = useState(null);
   const [imageProgress, setImageProgress] = useState(null);
   const [open, setOpen] = React.useState(false);
+  const [participents, setParticipents] = React.useState([]);
+  const [calculatedPrize, setCalculatedPrize] = useState(0);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -66,10 +68,10 @@ const Quizdetails = () => {
 
   useEffect(() => {
     const docQuiz = onSnapshot(
-      doc(db, `quiz`,id),
+      doc(db, `quiz`, id),
       (snapShot) => {
         setQuiz(snapShot.data());
-        console.log("usama",snapShot.data());
+        // console.log("usama",snapShot.data());
       },
       (error) => {
         console.log(error);
@@ -79,9 +81,38 @@ const Quizdetails = () => {
       docQuiz();
     };
   }, [id]);
-  
+
   useEffect(() => {
-    const unsub = onSnapshot( query (collection(db, `quiz/${id}/questions`), orderBy("createdAt")),
+    const unsub = onSnapshot(
+      collection(db, `quiz/${id}/participents`),
+      (snapShot) => {
+        setParticipents(snapShot.size);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+    return () => {
+      unsub();
+    };
+  }, [id]);
+
+  useEffect(() => {
+    const calculatePrize = () => {
+      const calculatedValue = participents * quiz.percentage / 100;
+      setCalculatedPrize(calculatedValue > quiz.prize ? calculatedValue : quiz.prize);
+      console.log('Calcly participents',participents);
+      console.log('quiz.percentage',quiz.percentage);
+      console.log("quiz.prize",quiz.prize);
+    };
+
+    calculatePrize();
+  }, [participents, quiz.percentage, quiz.prize]);
+
+
+  useEffect(() => {
+    const unsub = onSnapshot(
+      query(collection(db, `quiz/${id}/questions`), orderBy("createdAt")),
       (snapShot) => {
         let list = [];
         snapShot.docs.forEach((doc) => {
@@ -93,7 +124,6 @@ const Quizdetails = () => {
         console.log(error);
       }
     );
-
     return () => {
       unsub();
     };
@@ -144,7 +174,6 @@ const Quizdetails = () => {
         setImageProgress(progress);
       },
       (error) => {
-
         console.log(error);
       },
       () => {
@@ -171,7 +200,7 @@ const Quizdetails = () => {
         console.log("adding");
         await addDoc(collection(db, `quiz/${quizId}/questions`), {
           ...dataForm,
-          createdAt: Timestamp.fromDate(new Date())
+          createdAt: Timestamp.fromDate(new Date()),
         });
       } else {
         await updateDoc(doc(db, `quiz/${quizId}/questions/`, questionId), {
@@ -180,7 +209,7 @@ const Quizdetails = () => {
       }
       setDataForm(initialState);
       setFile(null);
-      setImageProgress(null)
+      setImageProgress(null);
       setImageProgress(null);
       handleClose();
     } catch (err) {
@@ -245,16 +274,49 @@ const Quizdetails = () => {
   return (
     <div className="">
       <div className="page_header">
-        <div style={{display: "flex", justifyContent: "space-between", my:"5px"}}>
-        <h1 className="text-black font-bold mb-4 underline text-4xl">Quiz Details</h1>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            my: "5px",
+          }}
+        >
+          <h1 className="text-black font-bold mb-4 underline text-4xl">
+            Quiz Details
+          </h1>
         </div>
-        {quiz!=null && <div className="flex flex-col md:flex-row">
-          <p className="top-row"><span style={{fontWeight:"bold"}}>Start Date : </span> {convertDate(quiz.startAt)}</p>
-          <p className="top-row"><span style={{fontWeight:"bold"}}>End Date : </span>End Date: {convertDate(quiz.endAt)}  </p>
-          <p className="top-row"><span style={{fontWeight:"bold"}}>Fee : </span> {quiz.fee}  </p>
-          <p className="top-row"><span style={{fontWeight:"bold"}}>percentage : </span> {quiz.percentage}  </p>
-          <p className="top-row"><span style={{fontWeight:"bold"}}>Prize : </span> {quiz.prize}  </p>
-        </div>}
+        {quiz != null && (
+          <div className="flex flex-col md:flex-row">
+            <p className="top-row">
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Start Date : </span>{" "}
+              {convertDate(quiz.startAt)}
+            </p>
+            <p className="top-row">
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>End Date : </span>End Date:{" "}
+              {convertDate(quiz.endAt)}{" "}
+            </p>
+            <p className="top-row">
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Fee : </span> {quiz.fee}{" "}
+            </p>
+            <p className="top-row">
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>percentage : </span>{" "}
+              {quiz.percentage}{" "}
+            </p>
+            <p className="top-row">
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Prize : </span> {quiz.prize}{" "}
+            </p>
+          </div>
+        )}
+        {quiz != null && (
+          <div className="flex flex-col md:flex-row">
+            <p className="top-row">
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Participents :  </span> {participents}{" "}
+            </p>
+            <p className="top-row">
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Calculated Prize :  </span> {calculatedPrize}{" "}
+            </p>
+          </div>
+        )}
         <Dialog fullWidth={true} open={open} onClose={handleClose}>
           <DialogTitle>
             {questionId == null ? "Add Question" : "Edit Question"}
@@ -357,17 +419,14 @@ const Quizdetails = () => {
       </div>
       {/* </div> */}
 
-
       <div className="table_header">
         <h2>Questions</h2>
         <Button variant="outlined" onClick={addQuestionModel}>
-        + Add Question
-      </Button>
+          + Add Question
+        </Button>
       </div>
-      <Box sx={{ height: 500, width: '100%' }} className="datatable">
-        
+      <Box sx={{ height: 500, width: "100%" }} className="datatable">
         <DataGrid
-          
           rowHeight={80}
           rows={data}
           getRowId={(row) => row.id}
@@ -380,11 +439,13 @@ const Quizdetails = () => {
   );
 
   function convertDate(date) {
-    return  <div>
-    {date.toDate().toDateString() +
-      "\n At \n" +
-      date.toDate().toLocaleTimeString("en-US")}
-  </div>
+    return (
+      <div>
+        {date.toDate().toDateString() +
+          "\n At \n" +
+          date.toDate().toLocaleTimeString("en-US")}
+      </div>
+    );
   }
 };
 
