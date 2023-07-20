@@ -26,7 +26,7 @@ const Users = () => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [userOrderBy, setUserOrderBy] = useState(null);
+  const [userOrderBy, setUserOrderBy] = useState('name');
   const dropdownRef = useRef(null);
 
   // Close the dropdown when clicking outside
@@ -85,13 +85,14 @@ const Users = () => {
 
   useEffect(() => {
     const unsub = onSnapshot(
-      query(collection(db, 'users'), orderBy(userOrderBy)),
+      query(collection(db, 'users'), orderBy(userOrderBy,'desc')),
       (snapshot) => {
         let list = [];
         snapshot.docs.forEach((doc) => {
           list.push({ id: doc.id, ...doc.data() });
         });
         setData(list);
+        console.log(list)
       },
       (error) => {
         console.log(error);
@@ -116,15 +117,11 @@ const Users = () => {
     createdAt: "",
     name: "",
     email: "",
-    phone: "",
-    emailVerified: "",
-    uid: "",
-    infoAdded: "",
-    infoNeeded: "",
+    phone: "", 
+    uid: "", 
     winningEmail: "",
     winningName: "",
-    govtId: "",
-    coins: "",
+    govtId: "", 
   };
 
   // const AddUser = () => {
@@ -135,129 +132,29 @@ const Users = () => {
   const handleEdit = (doc) => {
     console.log("edit calling");
     //   setuserId(doc.id);
-    formData.createdAt = new Date(
-      doc.createdAt.toDate().getTime() -
-        doc.createdAt.toDate().getTimezoneOffset() * 60000
-    )
-      .toISOString()
-      .slice(0, -1);
+    console.log(typeof( doc.createdAt));
+    if(doc.createdAt===undefined||doc.createdAt===null || doc.createdAt===''){
+      formData.createdAt = '-'
+     
+    }else{
+      formData.createdAt = (new Date(
+        doc.createdAt.toDate().getTime() -
+          doc.createdAt.toDate().getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .slice(0, -1));
+    }
     formData.name = doc.name.toString();
-    formData.image = doc.image;
-    formData.email = doc.email.toString();
-    formData.coins = doc.coins.toString();
-    formData.emailVerified = doc.emailVerified.toString();
-    formData.govtId = doc.govtId.toString();
-    formData.infoAdded = doc.infoAdded.toString();
-    formData.infoNeeded = doc.infoNeeded.toString();
-    formData.phone = doc.phone.toString();
+    formData.image = doc.image??'';
+    formData.email = doc.email??'';  
+    formData.govtId =doc.govtId?? ""; 
+    formData.phone = doc.phone??'';
     formData.uid = doc.uid.toString();
-    formData.winningEmail = doc.winningEmail.toString();
-    formData.winningName = doc.winningName.toString();
+    formData.winningEmail = doc.winningEmail??'';
+    formData.winningName = doc.winningName??'';
     handleClickOpen();
   };
 
-  //   const handleAddNew = () => {
-  //     setQuizId(null);
-  //     var now = new Date();
-  //     now.setHours(23);
-  //     now.setMinutes(59);
-  //     now.setSeconds(0, 0);
-  //     var weeLater = new Date();
-  //     weeLater.setHours(23);
-  //     weeLater.setMinutes(59);
-  //     weeLater.setSeconds(0, 0);
-  //     weeLater.setDate(weeLater.getDate() + 7);
-  //     formData.startAt = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-  //       .toISOString()
-  //       .slice(0, -1);
-  //     formData.endAt = new Date(
-  //       weeLater.getTime() - weeLater.getTimezoneOffset() * 60000
-  //     )
-  //       .toISOString()
-  //       .slice(0, -1);
-  //     formData.fee = "1";
-  //     formData.percentage = "30";
-  //     formData.prize = "500";
-  //     handleClickOpen();
-  //   };
-  //   console.log(formData);
-
-  //   const handleChangeSwitch = async (docId, value) => {
-  //     await updateDoc(doc(db, "quiz", docId), {
-  //       active: value,
-  //     });
-  //     if (value) {
-  //       setNotification(docId);
-  //     }
-  //   };
-
-  //   const handleAdd = async (e) => {
-  //     e.preventDefault();
-  //     console.log("add new calling");
-  //     try {
-  //       formData.startAt = Timestamp.fromDate(new Date(formData.startAt));
-  //       formData.endAt = Timestamp.fromDate(new Date(formData.endAt));
-  //       formData.quiz = Timestamp.fromDate(new Date());
-  //       formData.fee = parseInt(formData.fee);
-  //       formData.percentage = parseInt(formData.percentage);
-  //       formData.prize = parseInt(formData.prize);
-  //       var previousDate = new Date();
-  //       previousDate.setDate(previousDate.getDate() - 5);
-
-  //       if (quizId == null) {
-  //         console.log("adding new");
-  //         await addDoc(collection(db, "quiz"), {
-  //           ...formData,
-  //           winner: "",
-  //           lastDate: Timestamp.fromDate(previousDate),
-  //         }).then((doc) => {
-  //           setNotification(doc.id);
-  //         });
-  //       } else {
-  //         console.log(formData);
-  //         console.log("updating");
-  //         await updateDoc(doc(db, "quiz", quizId), {
-  //           ...formData,
-  //         });
-  //         setNotification(quizId);
-  //       }
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
-  //   async function setNotification(data) {
-  //     axios
-  //       .post(
-  //         "https://us-central1-weekly-treasure-4c3b5.cloudfunctions.net/scheduleNotification",
-  //         {
-  //           id: data,
-  //         },
-  //         {
-  //           headers: {
-  //             "Access-Control-Allow-Headers": "*",
-  //             "Access-Control-Allow-Origin": "*",
-  //             "Content-Type": "application/x-www-form-urlencoded",
-  //           },
-  //         }
-  //       )
-  //       .then((d) => {
-  //         console.log(d);
-  //       });
-  //     // axios
-  //     // .post('http://127.0.0.1:5001/weekly-treasure-4c3b5/us-central1/scheduleNotification', {
-  //     //   id: data,
-  //     //   },{
-  //     //     headers: {
-  //     //       "Access-Control-Allow-Headers": "*",
-  //     //       'Access-Control-Allow-Origin': '*',
-  //     //       'Content-Type': 'application/x-www-form-urlencoded'
-  //     //     }
-  //     //   }).then((d)=>{
-  //     //     console.log(d);
-  //     //   })
-
-  //     handleClose();
-  //   }
 
   const userColumns = [
     {
@@ -269,7 +166,7 @@ const Users = () => {
         return (
           <img
             style={{ width: 50, height: 50 }}
-            src={params.row.image || null}
+            src={params.row.image || ''}
           />
         );
       },
@@ -359,7 +256,7 @@ const Users = () => {
                   <input
                     id="createdAt"
                     readOnly
-                    value={formData.createdAt}
+                    value={ formData.createdAt}
                     type="datetime-local"
                   />
                 </div>
@@ -373,28 +270,8 @@ const Users = () => {
                   <input id="fee" value={formData.email} readOnly />
                 </div>
                 <div className="input-box">
-                  <span className="details">Email Verified</span>
-                  <input
-                    id="percentage"
-                    readOnly
-                    value={formData.emailVerified}
-                  />
-                </div>
-                <div className="input-box">
-                  <span className="details">Coins</span>
-                  <input id="prize" value={formData.coins} readOnly />
-                </div>
-                <div className="input-box">
                   <span className="details">Govt Id</span>
                   <input id="prize" value={formData.govtId} readOnly />
-                </div>
-                <div className="input-box">
-                  <span className="details">Info Added</span>
-                  <input id="prize" value={formData.infoAdded} readOnly />
-                </div>
-                <div className="input-box">
-                  <span className="details">Info Needed</span>
-                  <input id="prize" value={formData.infoNeeded} readOnly />
                 </div>
                 <div className="input-box">
                   <span className="details">UID</span>

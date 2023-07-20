@@ -39,7 +39,7 @@ const Quizdetails = () => {
   const [file, setFile] = useState(null);
   const [imageProgress, setImageProgress] = useState(null);
   const [open, setOpen] = React.useState(false);
-  const [participents, setParticipents] = React.useState([]);
+  const [participents, setParticipents] = React.useState(0);
   const [calculatedPrize, setCalculatedPrize] = useState(0);
 
   const handleClickOpen = () => {
@@ -97,17 +97,7 @@ const Quizdetails = () => {
     };
   }, [id]);
 
-  useEffect(() => {
-    const calculatePrize = () => {
-      const calculatedValue = participents * quiz.percentage / 100;
-      setCalculatedPrize(calculatedValue > quiz.prize ? calculatedValue : quiz.prize);
-      console.log('Calcly participents',participents);
-      console.log('quiz.percentage',quiz.percentage);
-      console.log("quiz.prize",quiz.prize);
-    };
-
-    calculatePrize();
-  }, [participents, quiz.percentage, quiz.prize]);
+ 
 
 
   useEffect(() => {
@@ -292,7 +282,7 @@ const Quizdetails = () => {
               {convertDate(quiz.startAt)}
             </p>
             <p className="top-row">
-              <span style={{ fontWeight: "bold", marginRight: "10px" }}>End Date : </span>End Date:{" "}
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>End Date : </span>
               {convertDate(quiz.endAt)}{" "}
             </p>
             <p className="top-row">
@@ -313,7 +303,7 @@ const Quizdetails = () => {
               <span style={{ fontWeight: "bold", marginRight: "10px" }}>Participents :  </span> {participents}{" "}
             </p>
             <p className="top-row">
-              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Calculated Prize :  </span> {calculatedPrize}{" "}
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Calculated Prize :  </span> {(participents*quiz.percentage/100)>quiz.prize?(participents*quiz.percentage/100):quiz.prize}{" "}
             </p>
           </div>
         )}

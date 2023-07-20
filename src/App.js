@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import { useNavigate } from "react-router-dom";
 // import PhoneAuth from "./components/PhoneAuth";
 import Home from "./components/Home";
 import Forgotpassword from "./components/Forgotpassword";
@@ -22,13 +23,30 @@ import { AuthContext } from './context/AuthContext';
 // import { auth } from "./firebase";
 
 function App() {
-  // const currentUser = true;
-  const { currentUser } = useContext(AuthContext);
-  // console.log(currentUser);
+  const navigate = useNavigate();
+  const email = localStorage.getItem("email");
+  const password = localStorage.getItem("password");
 
   const RequireAuth = ({ children }) => {
-    return currentUser ? children : <Navigate to='/' />;
+    
+    return children;
+    console.log('going')
+    if (email == null || password == null) {
+      {
+        console.log('not')
+        return navigate("/login");
+      }
+    }else{
+    }
   }
+  useEffect(() => {
+    // Navigate to a different page after the component has mounted
+    if (email == null && password == null) {
+      {
+        return navigate("/login");
+      }
+    }
+  }, []);
 
   return (
     <Routes>
