@@ -41,6 +41,7 @@ const Quizdetails = () => {
   const [open, setOpen] = React.useState(false);
   const [participents, setParticipents] = React.useState(0);
   const [calculatedPrize, setCalculatedPrize] = useState(0);
+  const [subloading, setSubloading] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -97,9 +98,6 @@ const Quizdetails = () => {
     };
   }, [id]);
 
- 
-
-
   useEffect(() => {
     const unsub = onSnapshot(
       query(collection(db, `quiz/${id}/questions`), orderBy("createdAt")),
@@ -131,6 +129,7 @@ const Quizdetails = () => {
   };
 
   const handleEdit = async (doc) => {
+    setSubloading(true);
     try {
       setQuestionId(doc.id);
       dataForm.picture = doc.picture;
@@ -141,6 +140,7 @@ const Quizdetails = () => {
     } catch (err) {
       console.log(err);
     }
+    setSubloading(false);
   };
 
   // Add Question
@@ -178,6 +178,7 @@ const Quizdetails = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     console.log("handleAdd");
+    setSubloading(true);
     try {
       if (file == null && questionId == null) {
         dataForm.picture = "";
@@ -205,12 +206,13 @@ const Quizdetails = () => {
     } catch (err) {
       console.log(err);
     }
+    setSubloading(false);
   };
   const userColumns = [
     {
       field: "picture",
       headerName: "Image",
-      width: 250,
+      width: 100,
       rowHeight: 80,
       renderCell: (params) => {
         return (
@@ -224,18 +226,18 @@ const Quizdetails = () => {
     {
       field: "question",
       headerName: "Question",
-      width: 250,
+      width: 200,
     },
     {
       field: "answer",
       headerName: "Answer",
-      width: 250,
+      width: 200,
     },
 
     {
       field: "hint",
       headerName: "Hint",
-      width: 250,
+      width: 200,
     },
   ];
   const actionColumn = [
@@ -276,34 +278,41 @@ const Quizdetails = () => {
           </h1>
         </div>
         {quiz != null && (
-          <div className="flex flex-col md:flex-row">
-            <p className="top-row">
-              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Start Date : </span>{" "}
+          <div className="flex flex-col md:flex-row md:space-x-4">
+            <p className="top-row mb-2 md:mb-0 md:mr-4 text-sm md:text-base">
+              <span className="font-bold">Start Date:</span>{" "}
               {convertDate(quiz.startAt)}
             </p>
-            <p className="top-row">
-              <span style={{ fontWeight: "bold", marginRight: "10px" }}>End Date : </span>
-              {convertDate(quiz.endAt)}{" "}
+            <p className="top-row mb-2 md:mb-0 md:mr-4 text-sm md:text-base">
+              <span className="font-bold">End Date:</span>{" "}
+              {convertDate(quiz.endAt)}
             </p>
-            <p className="top-row">
-              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Fee : </span> {quiz.fee}{" "}
+            <p className="top-row mb-2 md:mb-0 md:mr-4 text-sm md:text-base">
+              <span className="font-bold">Fee:</span> {quiz.fee}
             </p>
-            <p className="top-row">
-              <span style={{ fontWeight: "bold", marginRight: "10px" }}>percentage : </span>{" "}
-              {quiz.percentage}{" "}
+            <p className="top-row mb-2 md:mb-0 md:mr-4 text-sm md:text-base">
+              <span className="font-bold">Percentage:</span> {quiz.percentage}
             </p>
-            <p className="top-row">
-              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Prize : </span> {quiz.prize}{" "}
+            <p className="top-row mb-2 md:mb-0 text-sm md:text-base">
+              <span className="font-bold">Prize:</span> {quiz.prize}
             </p>
           </div>
         )}
         {quiz != null && (
           <div className="flex flex-col md:flex-row">
             <p className="top-row">
-              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Participents :  </span> {participents}{" "}
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>
+                Participents :{" "}
+              </span>{" "}
+              {participents}{" "}
             </p>
             <p className="top-row">
-              <span style={{ fontWeight: "bold", marginRight: "10px" }}>Calculated Prize :  </span> {(participents*quiz.percentage/100)>quiz.prize?(participents*quiz.percentage/100):quiz.prize}{" "}
+              <span style={{ fontWeight: "bold", marginRight: "10px" }}>
+                Calculated Prize :{" "}
+              </span>{" "}
+              {(participents * quiz.percentage) / 100 > quiz.prize
+                ? (participents * quiz.percentage) / 100
+                : quiz.prize}{" "}
             </p>
           </div>
         )}
@@ -399,7 +408,7 @@ const Quizdetails = () => {
                     disabled={imageProgress !== null && imageProgress < 100}
                     type="submit"
                   >
-                    Submit
+                    {subloading ? "Loading..." : "Submit"}
                   </Button>
                 </DialogActions>
               </div>
@@ -410,7 +419,9 @@ const Quizdetails = () => {
       {/* </div> */}
 
       <div className="table_header">
-        <h2>Questions</h2>
+        <h2 className="text-black font-bold mb-4 underline text-4xl">
+          Questions
+        </h2>
         <Button variant="outlined" onClick={addQuestionModel}>
           + Add Question
         </Button>

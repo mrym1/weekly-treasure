@@ -62,7 +62,7 @@ const Quizdetails = () => {
     {
       field: "Image",
       headerName: "Image",
-      width: 150,
+      width: 100,
       renderCell: (params) => {
         return <UserImage userId={params.row.userId} />;
       },
@@ -70,7 +70,7 @@ const Quizdetails = () => {
     {
       field: "Name",
       headerName: "Name",
-      width: 250,
+      width: 200,
       renderCell: (params) => {
         return <UserName userId={params.row.userId} />;
       },
@@ -78,7 +78,7 @@ const Quizdetails = () => {
     {
       field: "Email",
       headerName: "Email",
-      width: 300,
+      width: 250,
       // flex: 0,
       renderCell: (params) => {
         return <UserEmail userId={params.row.userId} />;
@@ -89,7 +89,7 @@ const Quizdetails = () => {
     {
       field: "See Response",
       headerName: "See Response",
-      width: 200,
+      width: 80,
       renderCell: (params) => {
         return (
           <div className="cellAction">

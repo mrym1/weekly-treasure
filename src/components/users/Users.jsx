@@ -7,6 +7,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect, useState, useRef } from "react";
 import { HiOutlineChevronDown, HiStar } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import Loader from "../Loader/Loader";
 
 import {
   Timestamp,
@@ -26,7 +27,8 @@ const Users = () => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [userOrderBy, setUserOrderBy] = useState('name');
+  const [userOrderBy, setUserOrderBy] = useState("name");
+  const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close the dropdown when clicking outside
@@ -84,26 +86,30 @@ const Users = () => {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
+
     const unsub = onSnapshot(
-      query(collection(db, 'users'), orderBy(userOrderBy,'desc')),
+      query(collection(db, "users"), orderBy(userOrderBy, "desc")),
       (snapshot) => {
         let list = [];
         snapshot.docs.forEach((doc) => {
           list.push({ id: doc.id, ...doc.data() });
         });
         setData(list);
-        console.log(list)
+        setLoading(false);
+        console.log(list);
       },
       (error) => {
         console.log(error);
+        setLoading(false);
       }
     );
-  
+
     return () => {
       unsub();
     };
   }, [userOrderBy]);
-  
+
   console.log(data);
 
   ////////////////////////////
@@ -117,44 +123,45 @@ const Users = () => {
     createdAt: "",
     name: "",
     email: "",
-    phone: "", 
-    uid: "", 
+    phone: "",
+    uid: "",
     winningEmail: "",
     winningName: "",
-    govtId: "", 
+    govtId: "",
   };
 
   // const AddUser = () => {
   const [formData, setFormData] = useState(initialState);
   const [userId, setuserId] = useState(null);
 
-
   const handleEdit = (doc) => {
     console.log("edit calling");
     //   setuserId(doc.id);
-    console.log(typeof( doc.createdAt));
-    if(doc.createdAt===undefined||doc.createdAt===null || doc.createdAt===''){
-      formData.createdAt = '-'
-     
-    }else{
-      formData.createdAt = (new Date(
+    console.log(typeof doc.createdAt);
+    if (
+      doc.createdAt === undefined ||
+      doc.createdAt === null ||
+      doc.createdAt === ""
+    ) {
+      formData.createdAt = "-";
+    } else {
+      formData.createdAt = new Date(
         doc.createdAt.toDate().getTime() -
           doc.createdAt.toDate().getTimezoneOffset() * 60000
       )
         .toISOString()
-        .slice(0, -1));
+        .slice(0, -1);
     }
     formData.name = doc.name.toString();
-    formData.image = doc.image??'';
-    formData.email = doc.email??'';  
-    formData.govtId =doc.govtId?? ""; 
-    formData.phone = doc.phone??'';
+    formData.image = doc.image ?? "";
+    formData.email = doc.email ?? "";
+    formData.govtId = doc.govtId ?? "";
+    formData.phone = doc.phone ?? "";
     formData.uid = doc.uid.toString();
-    formData.winningEmail = doc.winningEmail??'';
-    formData.winningName = doc.winningName??'';
+    formData.winningEmail = doc.winningEmail ?? "";
+    formData.winningName = doc.winningName ?? "";
     handleClickOpen();
   };
-
 
   const userColumns = [
     {
@@ -164,10 +171,7 @@ const Users = () => {
       //   rowHeight: 80,
       renderCell: (params) => {
         return (
-          <img
-            style={{ width: 50, height: 50 }}
-            src={params.row.image || ''}
-          />
+          <img style={{ width: 50, height: 50 }} src={params.row.image || ""} />
         );
       },
     },
@@ -256,34 +260,34 @@ const Users = () => {
                   <input
                     id="createdAt"
                     readOnly
-                    value={ formData.createdAt}
+                    value={formData.createdAt}
                     type="datetime-local"
                   />
                 </div>
                 <div className="input-box">
                   <span className="details">Name</span>
-                  <input id="endAt" value={formData.name} readOnly />
+                  <input id="name" value={formData.name} readOnly />
                 </div>
 
                 <div className="input-box">
                   <span className="details">Email</span>
-                  <input id="fee" value={formData.email} readOnly />
+                  <input id="email" value={formData.email} readOnly />
                 </div>
                 <div className="input-box">
                   <span className="details">Govt Id</span>
-                  <input id="prize" value={formData.govtId} readOnly />
+                  <input id="govtId" value={formData.govtId} readOnly />
                 </div>
                 <div className="input-box">
                   <span className="details">UID</span>
-                  <input id="prize" value={formData.uid} readOnly />
+                  <input id="uid" value={formData.uid} readOnly />
                 </div>
                 <div className="input-box">
                   <span className="details">Wining Email</span>
-                  <input id="prize" value={formData.winningEmail} readOnly />
+                  <input id="winningEmail" value={formData.winningEmail} readOnly />
                 </div>
                 <div className="input-box">
                   <span className="details">Wining Name</span>
-                  <input id="prize" value={formData.winningName} readOnly />
+                  <input id="winningName" value={formData.winningName} readOnly />
                 </div>
               </div>
               <DialogActions>
@@ -293,98 +297,104 @@ const Users = () => {
           </DialogContent>
         </Dialog>
 
-        <div className="table_header" style={{ marginTop: "40px" }}>
-          <h1 className="text-black font-bold mb-4 underline text-4xl">
-            Users
-          </h1>
-          <div className="relative inline-block text-left">
-            <button
-              type="button"
-              className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              onClick={toggleDropdown}
-            >
-              Order By
-              <HiOutlineChevronDown className="ml-1 text-gray-400" />
-            </button>
-
-            {isOpen && (
-              <div
-                ref={dropdownRef}
-                className="absolute right-0 w-40 mt-2 bg-white rounded-md shadow-lg z-10"
-              >
-                <ul
-                  className="py-1 space-y-1"
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="options-menu"
+        {loading ? (
+          <Loader />
+        ) : (
+          <div>
+            <div className="table_header" style={{ marginTop: "40px" }}>
+              <h1 className="text-black font-bold mb-4 underline text-4xl">
+                Users
+              </h1>
+              <div className="relative inline-block text-left">
+                <button
+                  type="button"
+                  className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  onClick={toggleDropdown}
                 >
-                  <li>
-                    <button
-                      type="button"
-                      className={`${
-                        userOrderBy === "Name"
-                          ? "bg-gray-100 text-gray-900"
-                          : ""
-                      } flex items-center justify-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900`}
-                      role="menuitem"
-                      onClick={() => handleOptionClick("name")}
+                  Order By
+                  <HiOutlineChevronDown className="ml-1 text-gray-400" />
+                </button>
+
+                {isOpen && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute right-0 w-40 mt-2 bg-white rounded-md shadow-lg z-10"
+                  >
+                    <ul
+                      className="py-1 space-y-1"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="options-menu"
                     >
-                      <span className="mr-2">Name</span>
-                      {userOrderBy === "Name" && (
-                        <HiStar className="text-yellow-500" />
-                      )}
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      className={`${
-                        userOrderBy === "CreatedAt"
-                          ? "bg-gray-100 text-gray-900"
-                          : ""
-                      } flex items-center justify-center w-full  px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900`}
-                      role="menuitem"
-                      onClick={() => handleOptionClick("createdAt")}
-                    >
-                      <span className="mr-2">Created At</span>
-                      {userOrderBy === "CreatedAt" && (
-                        <HiStar className=" text-yellow-500" />
-                      )}
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      className={`${
-                        userOrderBy === "Email"
-                          ? "bg-gray-100 text-gray-900"
-                          : ""
-                      } flex items-center justify-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900`}
-                      role="menuitem"
-                      onClick={() => handleOptionClick("email")}
-                    >
-                      <span className="mr-2">Email</span>
-                      {userOrderBy === "Email" && (
-                        <HiStar className="mr-1 text-yellow-500" />
-                      )}
-                    </button>
-                  </li>
-                </ul>
+                      <li>
+                        <button
+                          type="button"
+                          className={`${
+                            userOrderBy === "Name"
+                              ? "bg-gray-100 text-gray-900"
+                              : ""
+                          } flex items-center justify-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900`}
+                          role="menuitem"
+                          onClick={() => handleOptionClick("name")}
+                        >
+                          <span className="mr-2">Name</span>
+                          {userOrderBy === "Name" && (
+                            <HiStar className="text-yellow-500" />
+                          )}
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          className={`${
+                            userOrderBy === "CreatedAt"
+                              ? "bg-gray-100 text-gray-900"
+                              : ""
+                          } flex items-center justify-center w-full  px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900`}
+                          role="menuitem"
+                          onClick={() => handleOptionClick("createdAt")}
+                        >
+                          <span className="mr-2">Created At</span>
+                          {userOrderBy === "CreatedAt" && (
+                            <HiStar className=" text-yellow-500" />
+                          )}
+                        </button>
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          className={`${
+                            userOrderBy === "Email"
+                              ? "bg-gray-100 text-gray-900"
+                              : ""
+                          } flex items-center justify-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900`}
+                          role="menuitem"
+                          onClick={() => handleOptionClick("email")}
+                        >
+                          <span className="mr-2">Email</span>
+                          {userOrderBy === "Email" && (
+                            <HiStar className="mr-1 text-yellow-500" />
+                          )}
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+            <div className="datatable">
+              <DataGrid
+                autoHeight
+                rowHeight={60}
+                rows={data}
+                getRowId={(row) => row.id}
+                columns={userColumns.concat(actionColumn)}
+                pageSize={10}
+                rowsPerPageOptions={[]}
+              />
+            </div>
           </div>
-        </div>
-        <div className="datatable">
-          <DataGrid
-            autoHeight
-            rowHeight={60}
-            rows={data}
-            getRowId={(row) => row.id}
-            columns={userColumns.concat(actionColumn)}
-            pageSize={10}
-            rowsPerPageOptions={[]}
-          />
-        </div>
+        )}
       </div>
     </div>
   );

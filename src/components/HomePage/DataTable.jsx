@@ -9,6 +9,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./datatable.css";
+import Loader from "../Loader/Loader";
 // import "./registeruser.css";
 
 import {
@@ -28,6 +29,8 @@ import Sidebar from "../sidebar/Sidebar";
 const Datatable = () => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [subloading, setSubloading] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -65,6 +68,7 @@ const Datatable = () => {
   // };
 
   useEffect(() => {
+    setLoading(true);
     const unsub = onSnapshot(
       query(collection(db, `quiz`), orderBy("quiz", "desc")),
       (snapShot) => {
@@ -73,9 +77,11 @@ const Datatable = () => {
           list.push({ id: doc.id, ...doc.data() });
         });
         setData(list);
+        setLoading(false);
       },
       (error) => {
         console.log(error);
+        setLoading(false);
       }
     );
 
@@ -103,7 +109,6 @@ const Datatable = () => {
   const [formData, setFormData] = useState(initialState);
   const [quizId, setQuizId] = useState(null);
   const { startAt, endAt, quiz, fee, percentage, prize } = data;
-  const [loading, setLoading] = useState(null);
 
   const handleChange = (e) => {
     const id = e.target.id;
@@ -183,6 +188,7 @@ const Datatable = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     console.log("add new calling");
+    setSubloading(true);
     try {
       formData.startAt = Timestamp.fromDate(new Date(formData.startAt));
       formData.endAt = Timestamp.fromDate(new Date(formData.endAt));
@@ -213,6 +219,7 @@ const Datatable = () => {
     } catch (err) {
       console.log(err);
     }
+    setSubloading(false);
   };
   async function setNotification(data) {
     axios
@@ -417,42 +424,47 @@ const Datatable = () => {
               </div>
               <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button type="submit">Submit</Button>
+                <Button type="submit">{subloading ? "Loading..." : "Submit"}</Button>
               </DialogActions>
             </form>
           </DialogContent>
         </Dialog>
 
-        <div className="table_header" style={{ marginTop: "40px" }}>
-          <h1
-            className="text-black font-bold mb-4 underline text-4xl"
-          >
-            Quizzes
-          </h1>
+        {/* Conditionally render the Loader component */}
+        {loading ? (
+          <Loader />
+        ) : (
           <div>
-            <Button
-              variant="outlined"
-              onClick={handleAddNew}
-              sx={{ marginRight: "10px" }}
-            >
-              + Add New
-            </Button>
-            {/* <Button variant="outlined" onClick={handleLogout} color="error">
+            <div className="table_header" style={{ marginTop: "40px" }}>
+              <h1 className="text-black font-bold mb-4 underline text-4xl">
+                Quizzes
+              </h1>
+              <div>
+                <Button
+                  variant="outlined"
+                  onClick={handleAddNew}
+                  sx={{ marginRight: "10px" }}
+                >
+                  + Add New
+                </Button>
+                {/* <Button variant="outlined" onClick={handleLogout} color="error">
               Logout
             </Button> */}
+              </div>
+            </div>
+            <div className="datatable">
+              <DataGrid
+                autoHeight
+                rowHeight={60}
+                rows={data}
+                getRowId={(row) => row.id}
+                columns={userColumns.concat(actionColumn)}
+                pageSize={10}
+                rowsPerPageOptions={[]}
+              />
+            </div>
           </div>
-        </div>
-        <div className="datatable">
-          <DataGrid
-            autoHeight
-            rowHeight={60}
-            rows={data}
-            getRowId={(row) => row.id}
-            columns={userColumns.concat(actionColumn)}
-            pageSize={10}
-            rowsPerPageOptions={[]}
-          />
-        </div>
+        )}
       </div>
     </div>
   );
