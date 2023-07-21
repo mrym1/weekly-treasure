@@ -10,15 +10,8 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../Loader/Loader";
 
 import {
-  Timestamp,
-  addDoc,
   collection,
-  deleteDoc,
-  doc,
   onSnapshot,
-  orderBy,
-  query,
-  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import Sidebar from "../sidebar/Sidebar";
@@ -32,28 +25,28 @@ const Support = () => {
   const dropdownRef = useRef(null);
 
   // Close the dropdown when clicking outside
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleOutsideClick = (event) => {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+  //       setIsOpen(false);
+  //     }
+  //   };
 
-    document.addEventListener("mousedown", handleOutsideClick);
+  //   document.addEventListener("mousedown", handleOutsideClick);
 
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleOutsideClick);
+  //   };
+  // }, []);
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+  // const toggleDropdown = () => {
+  //   setIsOpen(!isOpen);
+  // };
 
-  const handleOptionClick = (option) => {
-    setUserOrderBy(option);
-    setIsOpen(false);
-  };
+  // const handleOptionClick = (option) => {
+  //   setUserOrderBy(option);
+  //   setIsOpen(false);
+  // };
 
   ////////////////////////
   const handleClickOpen = () => {
@@ -120,6 +113,7 @@ const Support = () => {
 
   const initialState = {
     id: "",
+    createdAt: "",
     name: "",
     query: "",
   };
@@ -142,6 +136,27 @@ const Support = () => {
       field: "id",
       headerName: "ID",
       width: 200,
+    },
+    {
+      field: "createdAt",
+      headerName: "Created Date",
+      width: 200,
+      renderCell: (params) => {
+        if (
+          params.row.createdAt === "" ||
+          params.row.createdAt === null ||
+          params.row.createdAt === undefined
+        ) {
+          return <div>-</div>;
+        } else {
+          return (
+            <div>
+              {params.row.createdAt.toDate().toDateString()} <br />
+              At {params.row.createdAt.toDate().toLocaleTimeString("en-US")}
+            </div>
+          );
+        }
+      },
     },
     {
       field: "name",
@@ -186,6 +201,15 @@ const Support = () => {
                 <div className="input-box">
                   <span className="details">ID</span>
                   <input id="name" value={formData.id} readOnly />
+                </div>
+                <div className="input-box">
+                  <span className="details">Created Date</span>
+                  <input
+                    id="createdAt"
+                    readOnly
+                    value={formData.createdAt}
+                    type="datetime-local"
+                  />
                 </div>
                 <div className="input-box">
                   <span className="details">Name</span>

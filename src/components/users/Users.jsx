@@ -30,6 +30,7 @@ const Users = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userOrderBy, setUserOrderBy] = useState("name");
   const [loading, setLoading] = useState(false);
+  const [userCount, setUserCount] = useState(0);
   const dropdownRef = useRef(null);
 
   // Close the dropdown when clicking outside
@@ -99,6 +100,7 @@ const Users = () => {
         setData(list);
         setLoading(false);
         console.log(list);
+        setUserCount(list.length);
       },
       (error) => {
         console.log(error);
@@ -206,11 +208,31 @@ const Users = () => {
       field: "email",
       headerName: "Email",
       width: 200,
+      renderCell: (params) => {
+        return (
+          <div className="flex items-center">
+            {params.row.emailVerified && (
+              <FaCheckCircle className="text-green-500 mr-2" />
+            )}
+            {params.row.email}
+          </div>
+        );
+      },
     },
     {
       field: "phone",
       headerName: "Phone",
       width: 200,
+      renderCell: (params) => {
+        return (
+          <div className="flex items-center">
+            {params.row.phone ? (
+              <FaCheckCircle className="text-green-500 mr-2" />
+            ) : null}
+            {params.row.phone}
+          </div>
+        );
+      },
     },
   ];
   const actionColumn = [
@@ -269,36 +291,35 @@ const Users = () => {
                   <span className="details">Name</span>
                   <input id="name" value={formData.name} readOnly />
                 </div>
-                
-                <div className="input-box">
-        <span className="details">Email</span>
-        <div className="relative">
-          <input
-            id="email"
-            value={formData.email}
-            readOnly
-            className="pl-8 pr-4"
-          />
-          {formData.email && (
-            <FaCheckCircle className="absolute right-0 top-0 mt-4 mr-2 text-green-500" />
-          )}
-        </div>
-      </div>
-      <div className="input-box">
-        <span className="details">Phone</span>
-        <div className="relative">
-          <input
-            id="phone"
-            value={formData.phone}
-            readOnly
-            className="pl-8 pr-4"
-          />
-          {formData.phone && (
-            <FaCheckCircle className="absolute right-0 top-0 mt-4 mr-2 text-green-500" />
-          )}
-        </div>
-      </div>
 
+                <div className="input-box">
+                  <span className="details">Email</span>
+                  <div className="relative">
+                    <input
+                      id="email"
+                      value={formData.email}
+                      readOnly
+                      className="pl-8 pr-4"
+                    />
+                    {formData.email && (
+                      <FaCheckCircle className="absolute right-0 top-0 mt-4 mr-2 text-green-500" />
+                    )}
+                  </div>
+                </div>
+                <div className="input-box">
+                  <span className="details">Phone</span>
+                  <div className="relative">
+                    <input
+                      id="phone"
+                      value={formData.phone}
+                      readOnly
+                      className="pl-8 pr-4"
+                    />
+                    {formData.phone && (
+                      <FaCheckCircle className="absolute right-0 top-0 mt-4 mr-2 text-green-500" />
+                    )}
+                  </div>
+                </div>
 
                 <div className="input-box">
                   <span className="details">Govt Id</span>
@@ -337,9 +358,17 @@ const Users = () => {
         ) : (
           <div>
             <div className="table_header" style={{ marginTop: "40px" }}>
-              <h1 className="text-black font-bold mb-4 underline text-4xl">
-                Users
-              </h1>
+              <div>
+                <h1 className="text-black font-bold mb-4 underline text-4xl">
+                  Users
+                </h1>
+                <p className="top-row">
+                  <span style={{ fontWeight: "bold", marginRight: "10px" }}>
+                    Total users :{" "}
+                  </span>{" "}
+                  {userCount}{" "}
+                </p>
+              </div>
               <div className="relative inline-block text-left">
                 <button
                   type="button"
@@ -373,7 +402,7 @@ const Users = () => {
                           onClick={() => handleOptionClick("name")}
                         >
                           <span className="mr-2">Name</span>
-                          {userOrderBy === "Name" && (
+                          {userOrderBy === "name" && (
                             <HiStar className="text-yellow-500" />
                           )}
                         </button>
@@ -390,7 +419,7 @@ const Users = () => {
                           onClick={() => handleOptionClick("createdAt")}
                         >
                           <span className="mr-2">Created At</span>
-                          {userOrderBy === "CreatedAt" && (
+                          {userOrderBy === "createdAt" && (
                             <HiStar className=" text-yellow-500" />
                           )}
                         </button>
@@ -407,7 +436,7 @@ const Users = () => {
                           onClick={() => handleOptionClick("email")}
                         >
                           <span className="mr-2">Email</span>
-                          {userOrderBy === "Email" && (
+                          {userOrderBy === "email" && (
                             <HiStar className="mr-1 text-yellow-500" />
                           )}
                         </button>
