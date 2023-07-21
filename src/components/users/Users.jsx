@@ -208,16 +208,6 @@ const Users = () => {
       field: "email",
       headerName: "Email",
       width: 200,
-      renderCell: (params) => {
-        return (
-          <div className="flex items-center">
-            {params.row.emailVerified && (
-              <FaCheckCircle className="text-green-500 mr-2" />
-            )}
-            {params.row.email}
-          </div>
-        );
-      },
     },
     {
       field: "phone",
@@ -291,21 +281,11 @@ const Users = () => {
                   <span className="details">Name</span>
                   <input id="name" value={formData.name} readOnly />
                 </div>
-
                 <div className="input-box">
                   <span className="details">Email</span>
-                  <div className="relative">
-                    <input
-                      id="email"
-                      value={formData.email}
-                      readOnly
-                      className="pl-8 pr-4"
-                    />
-                    {formData.email && (
-                      <FaCheckCircle className="absolute right-0 top-0 mt-4 mr-2 text-green-500" />
-                    )}
-                  </div>
+                  <input id="govtId" value={formData.email} readOnly />
                 </div>
+
                 <div className="input-box">
                   <span className="details">Phone</span>
                   <div className="relative">
@@ -320,7 +300,6 @@ const Users = () => {
                     )}
                   </div>
                 </div>
-
                 <div className="input-box">
                   <span className="details">Govt Id</span>
                   <input id="govtId" value={formData.govtId} readOnly />
@@ -331,19 +310,17 @@ const Users = () => {
                 </div>
                 <div className="input-box">
                   <span className="details">Wining Email</span>
-                  <input
-                    id="winningEmail"
-                    value={formData.winningEmail}
-                    readOnly
-                  />
-                </div>
-                <div className="input-box">
-                  <span className="details">Wining Name</span>
-                  <input
-                    id="winningName"
-                    value={formData.winningName}
-                    readOnly
-                  />
+                  <div className="relative">
+                    <input
+                      id="email"
+                      value={formData.winningEmail}
+                      readOnly
+                      className="pl-8 pr-4"
+                    />
+                    {formData.emailVerified && (
+                      <FaCheckCircle className="absolute right-0 top-0 mt-4 mr-2 text-green-500" />
+                    )}
+                  </div>
                 </div>
               </div>
               <DialogActions>

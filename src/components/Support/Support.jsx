@@ -9,10 +9,7 @@ import { HiOutlineChevronDown, HiStar } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader/Loader";
 
-import {
-  collection,
-  onSnapshot,
-} from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase";
 import Sidebar from "../sidebar/Sidebar";
 
@@ -218,7 +215,12 @@ const Support = () => {
 
                 <div className="input-box">
                   <span className="details">Query</span>
-                  <input id="email" value={formData.query} readOnly />
+                  <textarea
+                    id="email"
+                    value={formData.query}
+                    readOnly
+                    className="resize-vertical max-h-40 w-full border border-gray-300 rounded p-2"
+                  />
                 </div>
               </div>
               <DialogActions>
