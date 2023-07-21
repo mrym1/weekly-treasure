@@ -14,6 +14,7 @@ import RegisterUser from "./components/HomePage/RegisterUser";
 import UpdateUser from "./components/HomePage/UpdataUser";
 import DetailQuiz from "./components/DetailPage";
 import Users from "./components/users/Users";
+import Support from "./components/Support/Support";
 import NewQuestion from "./components/Questions/Newquestion";
 import { AuthContext } from './context/AuthContext';
 // import "./messaging_init_in_sw.js";
@@ -58,6 +59,7 @@ function App() {
       <Route path="/questions/:id" element={<RequireAuth><DetailQuiz/></RequireAuth>} />
       <Route path="/notification" element={<RequireAuth><Notification/></RequireAuth>} />
       <Route path="/users" element={<RequireAuth><Users/></RequireAuth>} />
+      <Route path="/support" element={<RequireAuth><Support/></RequireAuth>} />
       {/* <Route path="quiz/:id/newquestion/" element={<RequireAuth><NewQuestion/></RequireAuth>} /> */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />

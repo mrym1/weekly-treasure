@@ -8,7 +8,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { HiOutlineChevronDown, HiStar } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader/Loader";
-import { FaCheckCircle } from "react-icons/fa";
 
 import {
   Timestamp,
@@ -24,7 +23,7 @@ import {
 import { db } from "../../firebase";
 import Sidebar from "../sidebar/Sidebar";
 
-const Users = () => {
+const Support = () => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -90,7 +89,7 @@ const Users = () => {
     setLoading(true);
 
     const unsub = onSnapshot(
-      query(collection(db, "users"), orderBy(userOrderBy, "desc")),
+      collection(db, "support"),
       (snapshot) => {
         let list = [];
         snapshot.docs.forEach((doc) => {
@@ -109,7 +108,7 @@ const Users = () => {
     return () => {
       unsub();
     };
-  }, [userOrderBy]);
+  }, []);
 
   console.log(data);
 
@@ -120,15 +119,9 @@ const Users = () => {
   //////////////////////////
 
   const initialState = {
-    image: "",
-    createdAt: "",
+    id: "",
     name: "",
-    email: "",
-    phone: "",
-    uid: "",
-    winningEmail: "",
-    winningName: "",
-    govtId: "",
+    query: "",
   };
 
   // const AddUser = () => {
@@ -138,43 +131,17 @@ const Users = () => {
   const handleEdit = (doc) => {
     console.log("edit calling");
     //   setuserId(doc.id);
-    console.log(typeof doc.createdAt);
-    if (
-      doc.createdAt === undefined ||
-      doc.createdAt === null ||
-      doc.createdAt === ""
-    ) {
-      formData.createdAt = "-";
-    } else {
-      formData.createdAt = new Date(
-        doc.createdAt.toDate().getTime() -
-          doc.createdAt.toDate().getTimezoneOffset() * 60000
-      )
-        .toISOString()
-        .slice(0, -1);
-    }
-    formData.name = doc.name.toString();
-    formData.image = doc.image ?? "";
-    formData.email = doc.email ?? "";
-    formData.govtId = doc.govtId ?? "";
-    formData.phone = doc.phone ?? "";
-    formData.uid = doc.uid.toString();
-    formData.winningEmail = doc.winningEmail ?? "";
-    formData.winningName = doc.winningName ?? "";
+    formData.id = doc.id.toString();
+    formData.name = doc.name ?? "";
+    formData.query = doc.query ?? "";
     handleClickOpen();
   };
 
   const userColumns = [
     {
-      field: "image",
-      headerName: "Image",
-      //   width: 250,
-      //   rowHeight: 80,
-      renderCell: (params) => {
-        return (
-          <img style={{ width: 50, height: 50 }} src={params.row.image || ""} />
-        );
-      },
+      field: "id",
+      headerName: "ID",
+      width: 200,
     },
     {
       field: "name",
@@ -182,34 +149,8 @@ const Users = () => {
       width: 200,
     },
     {
-      field: "createdAt",
-      headerName: "Created Date",
-      width: 200,
-      renderCell: (params) => {
-        if (
-          params.row.createdAt === "" ||
-          params.row.createdAt === null ||
-          params.row.createdAt === undefined
-        ) {
-          return <div>-</div>;
-        } else {
-          return (
-            <div>
-              {params.row.createdAt.toDate().toDateString()} <br />
-              At {params.row.createdAt.toDate().toLocaleTimeString("en-US")}
-            </div>
-          );
-        }
-      },
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      width: 200,
-    },
-    {
-      field: "phone",
-      headerName: "Phone",
+      field: "query",
+      headerName: "Query",
       width: 200,
     },
   ];
@@ -237,92 +178,23 @@ const Users = () => {
       <div className=" md:ml-64 ml-6 flex-1 overflow-y-auto">
         <Dialog fullWidth={true} open={open} onClose={handleClose}>
           <DialogTitle>
-            <h1>User Detail</h1>
+            <h1>Support Detail</h1>
           </DialogTitle>
           <DialogContent>
             <form>
-              <div
-                className="input-box"
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <img
-                  src={formData.image}
-                  alt="Image"
-                  style={{ width: 100, height: 100, borderRadius: "50%" }}
-                />
-              </div>
               <div className="user-details">
                 <div className="input-box">
-                  <span className="details">Created Date</span>
-                  <input
-                    id="createdAt"
-                    readOnly
-                    value={formData.createdAt}
-                    type="datetime-local"
-                  />
+                  <span className="details">ID</span>
+                  <input id="name" value={formData.id} readOnly />
                 </div>
                 <div className="input-box">
                   <span className="details">Name</span>
                   <input id="name" value={formData.name} readOnly />
                 </div>
-                
-                <div className="input-box">
-        <span className="details">Email</span>
-        <div className="relative">
-          <input
-            id="email"
-            value={formData.email}
-            readOnly
-            className="pl-8 pr-4"
-          />
-          {formData.email && (
-            <FaCheckCircle className="absolute right-0 top-0 mt-4 mr-2 text-green-500" />
-          )}
-        </div>
-      </div>
-      <div className="input-box">
-        <span className="details">Phone</span>
-        <div className="relative">
-          <input
-            id="phone"
-            value={formData.phone}
-            readOnly
-            className="pl-8 pr-4"
-          />
-          {formData.phone && (
-            <FaCheckCircle className="absolute right-0 top-0 mt-4 mr-2 text-green-500" />
-          )}
-        </div>
-      </div>
-
 
                 <div className="input-box">
-                  <span className="details">Govt Id</span>
-                  <input id="govtId" value={formData.govtId} readOnly />
-                </div>
-                <div className="input-box">
-                  <span className="details">UID</span>
-                  <input id="uid" value={formData.uid} readOnly />
-                </div>
-                <div className="input-box">
-                  <span className="details">Wining Email</span>
-                  <input
-                    id="winningEmail"
-                    value={formData.winningEmail}
-                    readOnly
-                  />
-                </div>
-                <div className="input-box">
-                  <span className="details">Wining Name</span>
-                  <input
-                    id="winningName"
-                    value={formData.winningName}
-                    readOnly
-                  />
+                  <span className="details">Query</span>
+                  <input id="email" value={formData.query} readOnly />
                 </div>
               </div>
               <DialogActions>
@@ -338,9 +210,9 @@ const Users = () => {
           <div>
             <div className="table_header" style={{ marginTop: "40px" }}>
               <h1 className="text-black font-bold mb-4 underline text-4xl">
-                Users
+                Support
               </h1>
-              <div className="relative inline-block text-left">
+              {/* <div className="relative inline-block text-left">
                 <button
                   type="button"
                   className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -415,7 +287,7 @@ const Users = () => {
                     </ul>
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
             <div className="datatable">
               <DataGrid
@@ -435,4 +307,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Support;

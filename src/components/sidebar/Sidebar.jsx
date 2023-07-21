@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FiBell, FiLogOut, FiX } from "react-icons/fi";
-import { MdOutlineQuiz, MdOutlineHome } from "react-icons/md";
+import { MdOutlineQuiz, MdOutlineHome, MdOutlineContactSupport } from "react-icons/md";
 import { AiOutlineUser } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -79,6 +79,14 @@ const Sidebar = () => {
                 <AiOutlineUser />
               </span>
               <span>User</span>
+            </p>
+          </Link>
+          <Link to="/support">
+            <p className="flex items-center text-lg py-2 px-4 text-gray-200 hover:bg-gray-700 hover:bg-opacity-50 rounded">
+              <span className="mx-4">
+                <MdOutlineContactSupport />
+              </span>
+              <span>Support</span>
             </p>
           </Link>
           <Link to="/notification">
