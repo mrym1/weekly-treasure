@@ -9,7 +9,7 @@ import { HiOutlineChevronDown, HiStar } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader/Loader";
 
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../../firebase";
 import Sidebar from "../sidebar/Sidebar";
 
@@ -79,7 +79,7 @@ const Support = () => {
     setLoading(true);
 
     const unsub = onSnapshot(
-      collection(db, "support"),
+      query(collection(db, "support"),orderBy('createdAt','desc')),
       (snapshot) => {
         let list = [];
         snapshot.docs.forEach((doc) => {
@@ -122,6 +122,20 @@ const Support = () => {
   const handleEdit = (doc) => {
     console.log("edit calling");
     //   setuserId(doc.id);
+    if (
+      doc.createdAt === undefined ||
+      doc.createdAt === null ||
+      doc.createdAt === ""
+    ) {
+      formData.createdAt = "-";
+    } else {
+      formData.createdAt = new Date(
+        doc.createdAt.toDate().getTime() -
+          doc.createdAt.toDate().getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .slice(0, -1);
+    }
     formData.id = doc.id.toString();
     formData.name = doc.name ?? "";
     formData.query = doc.query ?? "";

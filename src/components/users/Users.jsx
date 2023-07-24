@@ -28,7 +28,7 @@ const Users = () => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [userOrderBy, setUserOrderBy] = useState("name");
+  const [userOrderBy, setUserOrderBy] = useState("createdAt");
   const [loading, setLoading] = useState(false);
   const [userCount, setUserCount] = useState(0);
   const dropdownRef = useRef(null);
@@ -91,7 +91,7 @@ const Users = () => {
     setLoading(true);
 
     const unsub = onSnapshot(
-      query(collection(db, "users"), orderBy(userOrderBy, "desc")),
+      query(collection(db, "users"), orderBy(userOrderBy,userOrderBy=='createdAt'? "desc":"asc")),
       (snapshot) => {
         let list = [];
         snapshot.docs.forEach((doc) => {
@@ -130,6 +130,7 @@ const Users = () => {
     uid: "",
     winningEmail: "",
     winningName: "",
+    emailVerified:false,
     govtId: "",
   };
 
@@ -163,6 +164,8 @@ const Users = () => {
     formData.uid = doc.uid.toString();
     formData.winningEmail = doc.winningEmail ?? "";
     formData.winningName = doc.winningName ?? "";
+    formData.emailVerified = doc.emailVerified ?? false;
+    
     handleClickOpen();
   };
 
@@ -295,7 +298,7 @@ const Users = () => {
                       readOnly
                       className="pl-8 pr-4"
                     />
-                    {formData.phone && (
+                    {formData.phone !='' && (
                       <FaCheckCircle className="absolute right-0 top-0 mt-4 mr-2 text-green-500" />
                     )}
                   </div>

@@ -78,7 +78,7 @@ const Sidebar = () => {
               <span className="mx-4">
                 <AiOutlineUser />
               </span>
-              <span>User</span>
+              <span>Users</span>
             </p>
           </Link>
           <Link to="/support">

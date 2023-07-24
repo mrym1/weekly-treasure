@@ -5,6 +5,7 @@ import History from "./details/History";
 import Quizdetails from "./details/Quizdetails";
 import Sidebar from "./sidebar/Sidebar";
 import Winner from "./details/Winner";
+import Participents from "./details/participents";
 
 const DetailPage = () => {
   const navigate = useNavigate();
@@ -33,11 +34,12 @@ const DetailPage = () => {
         <Sidebar />
       </div>
       <div className="md:ml-64 ml-6 flex-1 overflow-y-auto">
-          <div>
-            <Winner />
-            <Quizdetails />
-            <History />
-          </div>
+        <div>
+          <Winner />
+          <Quizdetails />
+          <History />
+          <Participents />
+        </div>
       </div>
     </div>
   );
